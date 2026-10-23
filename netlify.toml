@@ -4,6 +4,10 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  # Vite 7 requiere Node 20.19+ o 22.12+; fijarlo evita sorpresas en el build.
+  NODE_VERSION = "22"
+
 # 1. Redirige las llamadas /api al backend FastAPI desplegado en Render.
 #    Si creas el servicio con otro nombre en Render, actualiza el host de "to"
 #    (o define VITE_API_URL en Netlify para llamar a Render directamente).
