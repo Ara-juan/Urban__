@@ -1,0 +1,100 @@
+/* panel de administracion de productos */
+.admin-main {
+  max-width: 1000px;
+  padding-top: 110px; /* desplaza el contenido hacia abajo para que la navbar no tape el título */
+  margin-bottom: 40px;
+}
+
+/* tarjeta oscura principal con bordes redondeados y fondo borroso */
+.admin-main .profile-card {
+  background: rgba(0, 0, 0, 0.85);
+  padding: 35px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+/* titulo principal de la tarjeta en letra grande y blanca */
+.admin-main .profile-card h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 5px;
+}
+
+/* subtitulo en tono gris claro para no llamar tanto la atencion */
+.admin-main .profile-card p.subtitle {
+  color: #a0a0a0;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* subtitulos de cada seccion en verde neon para separar los bloques de campos */
+.admin-main .section-title {
+  color: #00ffcc;
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* texto pequeño sobre cada campo de entrada */
+.admin-main .form-label {
+  font-size: 13px;
+  color: #d1d1d1;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* estilo oscuro para las cajas de texto y campos de entrada */
+.admin-main .form-control {
+  background-color: rgba(20, 20, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* brillo sutil de enfoque alineado a la nueva paleta al dar clic sobre un campo */
+.admin-main .form-control:focus {
+  border-color: var(--bs-primary, #4da3ff);
+  box-shadow: 0 0 8px rgba(77, 163, 255, 0.5);
+  outline: none;
+}
+
+/* asegura que los desplegables mantengan el fondo oscuro al abrirse */
+.admin-main select.form-control option {
+  background-color: #141414;
+  color: white;
+}
+
+/* botón principal de guardado con contraste accesible */
+.admin-main .btn-save {
+  width: 100%;
+  padding: 12px;
+  background: var(--bs-primary, #4da3ff);
+  border: none;
+  border-radius: 6px;
+  color: #111;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* cambia a un azul un poco mas oscuro al pasar el cursor */
+.admin-main .btn-save:hover {
+  background: #338cf0;
+}
+
+/* reduce la opacidad y muestra cursor de espera si el boton esta desactivado */
+.admin-main .btn-save:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* limita el alto de la tabla de productos y le pone barra de desplazamiento */
+.admin-main .table-responsive {
+  max-height: 500px;
+  overflow-y: auto;
+}

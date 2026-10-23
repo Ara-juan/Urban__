@@ -1,0 +1,114 @@
+/* carrusel horizontal de productos */
+.carousel-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* la tira de productos en horizontal con scroll suave y sin barra visible */
+.products {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 15px 5px;
+  width: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* oculta la barra de scroll en chrome safari y navegadores similares */
+.products::-webkit-scrollbar {
+  display: none;
+}
+
+/* le da un ancho fijo a cada tarjeta para que no se aplasten */
+.products .card {
+  flex-shrink: 0;
+  width: 270px;
+  max-width: 270px;
+  box-sizing: border-box;
+}
+
+/* ajuste de tamaño de la imagen */
+.products .card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* botones / flechas de navegación actualizadas para accesibilidad visual */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(77, 163, 255, 0.85); /* rgba basado en #4da3ff */
+  color: #111; /* texto e icono oscuro para que contraste bien */
+  border: none;
+  font-size: 24px;
+  padding: 12px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  z-index: 10;
+  transition: background 0.3s ease;
+}
+
+/* cambia el color de la flecha cuando pasas el mouse encima */
+.arrow:hover {
+  background: rgba(51, 140, 240, 1); /* rgba basado en #338cf0 */
+}
+
+/* ubica las flechas izquierda y derecha hacia afuera */
+.left-arrow { left: -40px; }
+.right-arrow { right: -40px; }
+
+/* adaptación para tablets */
+@media (max-width: 768px) {
+  .products { gap: 12px; }
+  .products .card {
+    width: 200px;
+    max-width: 200px;
+    padding: 10px;
+  }
+  .products .card img { height: 180px; }
+  .left-arrow { left: -10px; }
+  .right-arrow { right: -10px; }
+  .arrow {
+    padding: 8px 6px;
+    font-size: 18px;
+  }
+}
+
+/* adaptación para celulares */
+@media (max-width: 480px) {
+  .products { gap: 10px; }
+  .products .card {
+    width: 160px;
+    max-width: 160px;
+    padding: 8px;
+  }
+  .products .card img { height: 140px; }
+}
+
+/* estados del carrusel (carga, error, vacío) */
+.estado-carga {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.estado-error {
+  color: #ff6b75;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.estado-vacio {
+  color: #e0e0e0;
+  font-style: italic;
+  font-size: 1.1rem;
+}

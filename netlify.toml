@@ -1,0 +1,20 @@
+# Configuración de despliegue en Netlify
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# 1. Redirige las llamadas /api al backend desplegado en Render
+#    (si cambias tu backend de URL, edita la línea "to")
+[[redirects]]
+  from = "/api/*"
+  to = "https://urban-clothes-slc0.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# 2. Fallback SPA: permite abrir rutas directas como /colecciones o /perfil
+#    sin que Netlify dé 404 (React Router las resuelve en el navegador)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

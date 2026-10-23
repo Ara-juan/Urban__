@@ -1,0 +1,211 @@
+/* contenedor principal centrado en toda la pantalla */
+.inicio-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  backdrop-filter: brightness(0.9);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* luz o resplandor suave que pulsa en el fondo */
+.inicio-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at center, rgba(77, 163, 255, 0.08) 0%, transparent 60%);
+  z-index: -1;
+  animation: pulseGlow 6s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+
+/* oculta texto de la pantalla pero se lo muestra a google y lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* ajusta el tamaño del logo le da sombra y una animacion para que flote */
+.inicio-container .logo {
+  width: 180px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));
+  animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) both, float 6s ease-in-out infinite 1s;
+}
+
+/* slogan principal en mayusculas texto blanco y con entrada animada */
+.slogan {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: white;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+/* agrupa los botones en columna los centra y los anima al aparecer */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+  width: 100%;
+  animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+/* texto informativo entre los botones en gris claro */
+.buttons p {
+  margin: 12px 0 6px 0;
+  font-size: 14px;
+  text-align: center;
+  color: #e0e0e0;
+  transition: color 0.3s ease;
+}
+
+/* quita la linea inferior de los enlaces */
+.buttons a {
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* boton llamativo azul con bordes redondeados y sombra */
+.buttons .btn {
+  background-color: var(--bs-primary, #4da3ff); 
+  color: #ffffff; 
+  font-weight: bold;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 24px;
+  margin: 4px 0 12px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  letter-spacing: 1px;
+  min-width: 150px; 
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* destello de luz transparente que cruza el boton */
+.buttons .btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: skewX(-20deg);
+  transition: all 0.6s ease;
+}
+
+/* mueve el boton un poco arriba y pasa el brillo al pasar el mouse */
+.buttons .btn:hover {
+  background-color: #338cf0;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px rgba(77, 163, 255, 0.35);
+}
+
+.buttons .btn:hover::after {
+  left: 150%;
+  transition: all 0.6s ease;
+}
+
+/* efecto de presion al hacer clic */
+.buttons .btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(77, 163, 255, 0.2);
+}
+
+/* enlace del pie de pagina en blanco y animado al entrar */
+.footer-link {
+  color: white;
+  text-decoration: none;
+  animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+}
+
+/* cambia al azul principal al pasar el cursor */
+.footer-link:hover {
+  color: #4da3ff; 
+}
+
+/* pie de pagina en texto pequeño con espacio para la linea animada */
+.footer {
+  font-size: 14px;
+  margin-top: 20px;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+/* linea azul abajo que empieza oculta en el centro */
+.footer::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -4px;
+  left: 50%;
+  background-color: #4da3ff;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-50%);
+}
+
+/* expande la linea al ancho completo al pasar el mouse */
+.footer-link:hover .footer::after {
+  width: 100%;
+}
+
+/* animaciones */
+
+/* sube el elemento suavemente mientras aparece */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* hace que el logo suba y baje lentamente dando efecto de flotar */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* hace que el brillo de fondo crezca y se encoga suavemente */
+@keyframes pulseGlow {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}

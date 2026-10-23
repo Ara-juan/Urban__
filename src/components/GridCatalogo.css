@@ -1,0 +1,91 @@
+/* cuadrícula y tarjetas del catálogo */
+.catalog {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* titulos en blanco con una linea azul abajo para darle estilo */
+.catalog h1, .catalog h2 {
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--bs-primary, #4da3ff);
+  display: inline-block;
+  color: white;
+}
+
+/* organizacion en grilla con tres columnas parejas para pantallas grandes */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 productos por fila en pantallas grandes */
+  gap: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+/* tarjeta con fondo oscuro semi transparente */
+.card {
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  width: 100%;
+  box-sizing: border-box;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* efecto sutil de ampliación al pasar el mouse */
+.card:hover {
+  transform: scale(1.02);
+}
+
+/* la imagen se adapta al 100% del ancho de la tarjeta manteniendo su proporción original */
+.card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* nombre del producto centrado con su margen */
+.card h3 {
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+/* precio del producto destacado en verde y negrita */
+.price {
+  color: #00ffcc;
+  font-weight: bold;
+}
+
+/* descripcion con letra gris mas discreta */
+.desc {
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* responsivo para tablets y celulares (2 productos por fila) */
+@media (max-width: 768px) {
+  .catalog { padding: 20px 10px; }
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .card { padding: 10px; }
+}
+
+/* ajustes para celulares móviles más pequeños */
+@media (max-width: 480px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .card { padding: 8px; }
+  .card h3 {
+    font-size: 0.85rem;
+    margin: 6px 0;
+  }
+  .price { font-size: 0.85rem; }
+}

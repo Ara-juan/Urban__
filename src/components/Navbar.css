@@ -1,0 +1,144 @@
+/* base de la barra de navegación superior */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 15px 30px;
+}
+
+/* clase extra para cuando necesitamos que el nav persiga al usuario al hacer scroll */
+.navbar.navbar-fija {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1050; /* nos aseguramos que siempre esté por encima del resto del contenido */
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* tamaño del texto del logo */
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* ajusta el tamaño de la imagen del logo */
+.logo img {
+  width: 120px;
+  height: auto;
+  display: block;
+}
+
+/* lista de enlaces horizontales */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+/* estilo de los textos del menu en blanco y sin subrayado */
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s ease;
+}
+
+/* cambia a azul claro cuando pasas el mouse encima para no cansar la vista */
+.nav-links li a:hover {
+  color: var(--bs-primary, #4da3ff);
+}
+
+/* resalta en azul el enlace de la seccion donde esta parado el usuario */
+.nav-links li a.active {
+  color: #4da3ff;
+}
+
+/* zona donde agrupamos el input, el select de precios y el botón */
+.search-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* estilo base para las cajas de texto y listas desplegables */
+.search-bar select,
+.search-bar input {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+/* fondo oscuro y cursor de mano para el selector de opciones */
+.search-bar select {
+  background-color: #222;
+  color: white;
+  cursor: pointer;
+}
+
+/* pone un borde azul claro cuando haces clic en el selector */
+.search-bar select:focus {
+  border: 1px solid var(--bs-primary, #4da3ff);
+}
+
+.search-bar button {
+  background: var(--bs-primary, #4da3ff);
+  border: none;
+  color: #111; /* texto o ícono oscuro hace mejor contraste con el botón azul claro */
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-bar button:hover {
+  background: #338cf0;
+}
+
+/* reglas para que se vea bien en celulares y tablets pequeñas */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  /* quitamos la posición fija en móviles porque quita mucho espacio útil de pantalla */
+  .navbar.navbar-fija {
+    position: relative;
+  }
+
+  /* centra los enlaces del menu si se acomodan en varias filas */
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  /* estiramos el buscador para que ocupe todo el ancho disponible */
+  .search-bar {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ajusta el tamaño maximo de la caja de busqueda */
+  .search-bar input {
+    flex: 1;
+    max-width: 180px;
+  }
+  
+  /* centramos los botones de perfil y salir */
+  .menu-usuario {
+    margin-left: 0;
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

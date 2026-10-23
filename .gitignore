@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+backend/node_modules/
+
+# Build de producción
+dist/
+
+# Variables de entorno (no subir a git)
+.env
+backend/.env
+backend_python/.env
+
+# Python
+backend_python/.venv/
+__pycache__/
+*.py[cod]
+
+# Logs temporales
+*.log

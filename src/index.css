@@ -1,0 +1,9 @@
+/* Estilos base de la app React */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: url('/assets/fondo.webp') no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+  min-height: 100vh;
+}

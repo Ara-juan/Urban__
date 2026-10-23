@@ -1,0 +1,245 @@
+/* Modal de detalles de producto */
+.modal {
+  display: flex;
+  position: fixed;
+  z-index: 1000; /* Asegura q el modal flote por encima del navbar y otros elementos*/
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  align-items: center;
+  justify-content: center;
+  animation: aparecerModal 0.3s ease; /* Trancision de opacidad al abrirse*/
+}
+
+/* Animación para un entrada suave mediante desvanecimiento (fade-in)*/
+@keyframes aparecerModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Ventana principal del modal con estética oscura e iluminación sutil por sombra */
+.modal-content {
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 90%;
+  max-width: 950px;
+  padding: 40px;
+  border-radius: 4px;
+  position: relative;
+  box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.7);
+  color: white;
+}
+
+/* Botón flotante 'X' en la esquina superior derecha para cerrar la ventana */
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  color: #aaa;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* cambia a azul cuando le pasas el mouse por encima */
+.close-modal:hover {
+  color: var(--bs-primary, #007BFF);
+}
+
+/* distribuye la imagen y la info en dos columnas que se acomodan si no hay espacio */
+.modal-body {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap; /* Permite que las columnas se apilen automáticamente si el espacio es reducido */
+  padding: 0;
+}
+
+/* le da el mismo tamaño base a las dos columnas */
+.modal-left,
+.modal-right {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* contenedor claro para que resalte la foto del producto */
+.image-container {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ajusta la imagen para que no se deforme ni se salga */
+.image-container img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* titulo principal del producto con fuente elegante */
+.urban-title {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 32px;
+  margin-top: 0;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+/* texto discreto para mostrar las unidades disponibles */
+.modal-stock {
+  color: #ccc;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+/* precio destacado en blanco y letra grande */
+.modal-price {
+  font-size: 26px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 25px;
+}
+
+/* subtitulo para las secciones internas como las tallas */
+.urban-subtitle {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+/* fila horizontal para organizar los botones de las tallas */
+.sizes-grid {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+/* cuadritos para seleccionar la talla con fondo transparente */
+.size-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: #fff;
+  width: 42px;
+  height: 38px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* resalta en azul al pasar el mouse por la talla */
+.size-btn:hover {
+  background: #0040ff;
+}
+
+/* resalta la talla elegida con un borde blanco y fondo azul */
+.size-btn.seleccionada {
+  background: #0040ff;
+  outline: 2px solid #ffffff66;
+}
+
+/* boton de comprar azul con estilo inclinado */
+.btn-buy {
+  background: #0040ff;
+  border: none;
+  color: white;
+  padding: 14px 0;
+  width: 80%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transform: skewX(-20deg);
+  box-shadow: 0 4px 15px rgba(0, 64, 255, 0.4);
+  transition: background 0.3s ease;
+  margin-bottom: 30px;
+}
+
+/* azul mas oscuro cuando pasas el cursor */
+.btn-buy:hover {
+  background: #0026b3;
+}
+
+/* endereza el texto del boton para que no quede inclinado */
+.btn-buy span {
+  display: block;
+  transform: skewX(20deg);
+}
+
+/* quita el subrayado y mantiene el color si es un enlace */
+.btn-buy a {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+}
+
+/* texto de la descripcion con buen espacio entre lineas */
+.modal-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #dedede;
+  text-align: justify;
+}
+
+/*versión responsive para moviles y tablets*/
+@media (max-width: 768px) {
+  /* limita el alto del modal y activa scroll si no cabe */
+  .modal-content {
+    padding: 30px 15px 40px 15px;
+    max-height: 85vh; /* Evita que el modal supere el alto de la pantalla */
+    overflow-y: auto; /* Permite desplazar verticalmente el contenido si no cabe */
+  }
+
+  /* Rediseño del botón de cierre como un círculo flotante visible en móviles */
+  .close-modal {
+    top: 8px;
+    right: 14px;
+    z-index: 10;
+    font-size: 30px;
+    background: rgba(0, 0, 0, 0.6);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* apila las columnas una sobre otra */
+  .modal-body {
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 10px;
+  }
+
+  /* ocupa todo el ancho disponible */
+  .modal-left,
+  .modal-right {
+    min-width: 100%;
+  }
+
+  /* expande el boton de compra al ancho completo */
+  .btn-buy {
+    width: 100%; 
+  }
+}
+
+/* ajustes finales para celulares mas pequeños */
+@media (max-width: 480px) {
+  .urban-title {
+    font-size: 22px;
+  }
+
+  .modal-price {
+    font-size: 20px;
+  }
+
+  .sizes-grid {
+    justify-content: center;
+  }
+}

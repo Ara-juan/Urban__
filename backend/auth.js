@@ -1,0 +1,53 @@
+// Manejo global de la sesión de usuario
+
+document.addEventListener('DOMContentLoaded', () => {
+  verificarSesion();
+});
+
+function verificarSesion() {
+  const token = localStorage.getItem('urban_token');
+  const usuarioRaw = localStorage.getItem('urban_user');
+
+  const contenedorUser = document.getElementById('userMenuNav');
+
+  // si hay sesión activa
+  if (token && usuarioRaw) {
+    try {
+      const usuario = JSON.parse(usuarioRaw);
+
+      // Comprobamos si el usuario es administrador (acepta 'ADMINISTRADOR' o 'admin')
+      const esAdmin = usuario.rol === 'ADMINISTRADOR' || usuario.rol === 'admin';
+
+      const botonAdmin = esAdmin 
+        ? `<a href="admin-productos.html" class="btn btn-warning btn-sm me-2 fw-bold">⚙️ Admin</a>` 
+        : '';
+
+      if (contenedorUser) {
+        contenedorUser.innerHTML = `
+          <span class="text-white small me-2">Hola, <strong>${usuario.nombre || usuario.email}</strong></span>
+          ${botonAdmin}
+          <a href="perfil.html" class="btn btn-outline-info btn-sm me-2">Perfil</a>
+          <button type="button" class="btn btn-outline-light btn-sm" onclick="cerrarSesion()">Salir</button>
+        `;
+      }
+      return;
+    } catch (error) {
+      console.error('Error al leer datos de sesión:', error);
+      cerrarSesion();
+      return;
+    }
+  }
+
+  // si es un invitado (no logeado)
+  if (contenedorUser) {
+    contenedorUser.innerHTML = `
+      <a href="login.html" class="btn btn-primary btn-sm">Iniciar Sesión / Registrarse</a>
+    `;
+  }
+}
+
+function cerrarSesion() {
+  localStorage.removeItem('urban_token');
+  localStorage.removeItem('urban_user');
+  window.location.href = 'login.html';
+}

@@ -1,0 +1,20 @@
+/* Secciones de catálogo (encabezados y espaciado) */
+.catalog {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* subtitulo en blanco con una linea azul abajo para darle estilo */
+.catalog h2 {
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--bs-primary, #007BFF);
+  display: inline-block;
+  color: white;
+}
+
+/* quita el subrayado de los enlaces y mantiene el mismo color del texto */
+.catalog a {
+  text-decoration: none;
+  color: inherit;
+}

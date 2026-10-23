@@ -1,0 +1,98 @@
+/* estilos de la seccion acerca de nosotros */
+.about {
+  padding: 60px 20px;
+}
+
+/* acomoda el logo y el texto lado a lado bien centrados */
+.about-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+
+/* limita el tamaño del logo para que no se deforme ni ocupe demasiado */
+.about-logo img {
+  width: 100%;
+  max-width: 450px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* limita el ancho del texto para que no sea cansado de leer */
+.about-text {
+  max-width: 500px;
+}
+
+/* titulo con linea azul abajo para mantener el estilo */
+.about-text h1 {
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--bs-primary, #4da3ff); /* ajustado al azul accesible */
+  display: inline-block;
+}
+
+/* parrafos con texto claro para buen contraste en fondo oscuro */
+.about-text p {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #e0e0e0; 
+}
+
+/* subtitulo para las redes con un tamaño medio */
+.about-text h2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+/* quita los puntos predeterminados de la lista de redes */
+.socials {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* separa un poco cada red social en la lista */
+.socials li {
+  margin: 8px 0;
+  color: #ccc;
+}
+
+/* enlaces de redes en azul claro resaltado */
+.socials a {
+  color: var(--bs-primary, #4da3ff);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* le pone subrayado cuando pasas el mouse por encima */
+.socials a:hover {
+  text-decoration: underline;
+  color: #338cf0;
+}
+
+/* ajustes para una sola columna en pantallas de móviles */
+@media (max-width: 768px) {
+  .about {
+    padding: 30px 15px;
+  }
+
+  /* apila el logo y el texto verticalmente y centra todo */
+  .about-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  /* reduce el logo para que quepa bien en celular */
+  .about-logo img {
+    max-width: 250px;
+    margin: 0 auto;
+  }
+
+  /* reduce un poco el tamaño del titulo principal */
+  .about-text h1 {
+    font-size: 1.5rem;
+  }
+}

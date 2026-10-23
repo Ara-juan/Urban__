@@ -1,0 +1,232 @@
+/* centra el formulario en la pantalla y le da espacio vertical */
+.login-container {
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 15px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* ajusta el tamaño del logo le da sombra y entrada animada */
+.login-container .logo {
+  width: 160px;
+  height: auto;
+  margin-bottom: 30px;
+  align-self: center;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* caja del formulario con efecto de cristal borroso y sombra profunda */
+.form-box {
+  background: rgba(15, 15, 15, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 35px 30px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+/* titulo principal del formulario en blanco y letra en negrita */
+.form-box h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #ffffff;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+/* barra para alternar entre iniciar sesion y registro */
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 25px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* estilo base de las pestañas repartidas por igual */
+.tab {
+  flex: 1; 
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  color: #a0a0a0;
+  font-weight: bold;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+/* cambia el texto a blanco al pasar el mouse */
+.tab:hover {
+  color: #ffffff;
+}
+
+/* resalta la pestaña activa en azul con sombra ligera */
+.tab.active {
+  background: var(--bs-primary, #4da3ff);
+  color: #111;
+  box-shadow: 0 2px 10px rgba(77, 163, 255, 0.3);
+}
+
+/* animacion de entrada suave para mostrar el formulario activo */
+.form.active {
+  animation: formFadeIn 0.5s ease forwards;
+}
+
+/* campos de texto con fondo transparente y bordes suaves */
+.form input {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+/* color claro para el texto de sugerencia dentro de la caja */
+.form input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* resalta el campo con borde azul y un pequeño salto al hacer clic */
+.form input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--bs-primary, #4da3ff);
+  box-shadow: 0 0 10px rgba(77, 163, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* boton azul de enviar con sombra y bordes redondeados */
+.form .btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--bs-primary, #4da3ff);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  margin-top: 15px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* destello de luz transparente que pasa sobre el boton */
+.form .btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: skewX(-20deg);
+  transition: all 0.6s ease;
+}
+
+/* sube el boton y pasa el brillo cuando el cursor esta encima */
+.form .btn:hover:not(:disabled) {
+  background-color: #338cf0;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(77, 163, 255, 0.35);
+}
+
+.form .btn:hover:not(:disabled)::after {
+  left: 150%;
+  transition: all 0.6s ease;
+}
+
+/* simula la presion del boton al hacer clic */
+.form .btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* desactiva el boton cuando no esta disponible */
+.form .btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* texto secundario en tono gris para la parte inferior */
+.link {
+  font-size: 14px;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  color: #b0b0b0;
+}
+
+/* texto o enlace interactivo con color verde neon */
+.link span, .link {
+  color: #00ffcc;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+/* hace brillar el enlace verde neon al pasar el mouse */
+.link span:hover, .link:hover {
+  color: #33ffdb;
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+}
+
+/* mantiene el parrafo contenedor en gris para no pintar todo de verde */
+p.link {
+  color: #b0b0b0;
+  cursor: default;
+}
+
+/* quita el brillo del parrafo para que solo brille el texto interactivo */
+p.link:hover {
+  color: #b0b0b0;
+  text-shadow: none;
+}
+
+/* animaciones */
+
+/* hace subir el elemento mientras va apareciendo */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* desplaza el formulario suavemente desde la derecha */
+@keyframes formFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

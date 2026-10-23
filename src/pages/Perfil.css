@@ -1,0 +1,208 @@
+/* contenedor del perfil centrado con espacio arriba para no tapar la barra */
+.profile-wrapper {
+  max-width: 520px;
+  margin: 0 auto 50px auto;
+  padding: 110px 15px 0 15px;
+  position: relative;
+  z-index: 1;
+}
+
+/* tarjeta con efecto de cristal borroso bordes suaves y entrada animada */
+.profile-card {
+  background: rgba(15, 15, 15, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 40px 35px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* titulo principal del perfil en letra blanca grande y resaltada */
+.profile-card h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+/* subtitulo en gris para texto secundario */
+.profile-card p.subtitle {
+  color: #a0a0a0;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+/* titulos de seccion en verde neon con un ligero brillo */
+.section-title {
+  color: #00ffcc;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+}
+
+/* texto de las etiquetas sobre cada campo */
+.form-label {
+  font-size: 13px;
+  color: #c0c0c0;
+  margin-bottom: 6px;
+  display: block;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* campos de entrada de texto oscuros con bordes suaves */
+.profile-card input.form-control {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+/* resalta el campo con borde azul y un salto sutil al hacer clic */
+.profile-card input.form-control:focus:not([readonly]) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--bs-primary, #4da3ff);
+  box-shadow: 0 0 10px rgba(77, 163, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* estilo con fondo mas oscuro para los campos que no se pueden editar */
+.profile-card input.form-control[readonly] {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-color: transparent;
+  color: #888888;
+  cursor: not-allowed;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* boton azul de guardado con bordes redondeados y sombra */
+.btn-save {
+  width: 100%;
+  padding: 14px;
+  background: var(--bs-primary, #4da3ff);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* destello de luz transparente que cruza el boton */
+.btn-save::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: skewX(-20deg);
+  transition: all 0.6s ease;
+}
+
+/* eleva el boton y le da mas brillo azul al pasar el raton */
+.btn-save:hover {
+  background-color: #338cf0;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(77, 163, 255, 0.35);
+}
+
+/* pasa el destello de luz de izquierda a derecha */
+.btn-save:hover::after {
+  left: 150%;
+  transition: all 0.6s ease;
+}
+
+/* efecto de presion al hacer clic sobre el boton */
+.btn-save:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(77, 163, 255, 0.2);
+}
+
+/* boton transparente con borde rojo para la opcion de eliminar */
+.btn-eliminar {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 75, 75, 0.5);
+  border-radius: 8px;
+  color: #ff4b4b;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+}
+
+/* fondo y brillo rojo suave al pasar el cursor encima */
+.btn-eliminar:hover {
+  background: rgba(255, 75, 75, 0.15);
+  border-color: #ff4b4b;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(255, 75, 75, 0.3);
+}
+
+/* pequeño encogimiento al presionar el boton de eliminar */
+.btn-eliminar:active {
+  transform: scale(0.98);
+}
+
+/* linea divisoria transparente en las puntas para separar secciones */
+hr.profile-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  margin: 25px 0;
+}
+
+/* adaptacion para celulares ajustando espacios y textos mas pequeños */
+@media (max-width: 768px) {
+  .profile-wrapper {
+    margin-bottom: 40px;
+    padding: 100px 10px 0 10px;
+  }
+  .profile-card {
+    padding: 25px 20px;
+  }
+  .profile-card h2 {
+    font-size: 22px;
+  }
+  .section-title {
+    font-size: 13px;
+  }
+}
+
+/* animaciones */
+
+/* sube el elemento suavemente mientras va apareciendo */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
