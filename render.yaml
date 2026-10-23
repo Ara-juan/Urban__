@@ -21,11 +21,11 @@ services:
         value: production
       # Supabase exige TLS. El backend usa un pool compatible con pgbouncer.
       - key: DB_SSL
-        value: true
+        value: "true"
       # 6543 = pooler en modo transacción de Supabase (igual que backend_python/.env).
       # Usa 5432 solo si conectas al host directo de la base de datos.
       - key: DB_PORT
-        value: 6543
+        value: "6543"
       - key: FRONTEND_URL
         value: https://americanos-hh.netlify.app
       # Secretos: se capturan en el panel de Render, nunca en el repositorio.
@@ -36,12 +36,12 @@ services:
       - key: DB_HOST
         sync: false
       - key: DB_NAME
-        sync: false
+        value: postgres
       - key: JWT_SECRET
         sync: false
       - key: RESEND_API_KEY
         sync: false
-      # Opcional: remitente verificado en Resend. Si se omite se usa
-      # "Americanoshh Support <onboarding@resend.dev>".
-      - key: RESEND_FROM
-        sync: false
+      # Opcional (añádela en el panel si verificas un dominio): remitente del correo.
+      # Si no existe se usa "Americanoshh Support <onboarding@resend.dev>".
+      # - key: RESEND_FROM
+      #   value: Americanoshh Support <no-responder@tudominio.com>

@@ -148,8 +148,8 @@ El repositorio incluye [`../render.yaml`](../render.yaml), un blueprint que crea
 Pasos:
 
 1. Render Dashboard → **New → Blueprint** → elige este repositorio.
-2. Completa los valores `sync: false`: `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`,
-   `JWT_SECRET` y `RESEND_API_KEY` (cópialos de `backend_python/.env`).
+2. Completa los valores `sync: false`: `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `JWT_SECRET` y
+   `RESEND_API_KEY` (cópialos de `backend_python/.env`). `DB_NAME` ya viene como `postgres`.
 3. Deploy. La URL queda como `https://urban-clothes-api.onrender.com`.
 4. Si el nombre ya está ocupado, Render pedirá otro: actualiza entonces el host en
    `netlify.toml` (o define `VITE_API_URL` en Netlify) y `FRONTEND_URL` en Render.
