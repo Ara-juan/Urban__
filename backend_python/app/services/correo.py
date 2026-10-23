@@ -11,13 +11,12 @@ from app.config import settings
 logger = logging.getLogger("urban.correo")
 
 RESEND_URL = "https://api.resend.com/emails"
-REMITENTE = "Americanoshh Support <onboarding@resend.dev>"
 ASUNTO = "Recuperación de Contraseña — Americanoshh"
-URL_CLIENTE = "https://americanos-hh.netlify.app/login"
 
 
 def construir_enlace_recuperacion(token: str) -> str:
-    return f"{URL_CLIENTE}?resetToken={token}"
+    # FRONTEND_URL permite apuntar el enlace al dominio real de Netlify (o a uno propio).
+    return f"{settings.frontend_url}/login?resetToken={token}"
 
 
 def construir_html_recuperacion(nombre: str | None, enlace: str) -> str:
@@ -46,8 +45,14 @@ def construir_html_recuperacion(nombre: str | None, enlace: str) -> str:
 
 async def enviar_correo_recuperacion(destinatario: str, nombre: str | None, enlace: str) -> None:
     """Llama a Resend y lanza una excepción si el envío falla (igual que en Node)."""
+    if not settings.resend_api_key:
+        logger.error(
+            "RESEND_API_KEY no está configurada: no se puede enviar el correo de recuperación."
+        )
+        raise RuntimeError("RESEND_API_KEY no está configurada en el servidor.")
+
     cuerpo = {
-        "from": REMITENTE,
+        "from": settings.resend_from,
         "to": [destinatario],
         "subject": ASUNTO,
         "html": construir_html_recuperacion(nombre, enlace),

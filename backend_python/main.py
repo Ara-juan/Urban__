@@ -78,6 +78,12 @@ app.include_router(usuarios.router)
 app.include_router(productos.router)
 
 
+@app.get("/api/salud", tags=["salud"])
+async def salud() -> dict[str, str]:
+    """Health check para Render: responde 200 sin depender de la base de datos."""
+    return {"estado": "ok", "servicio": "urban-clothes-api"}
+
+
 if __name__ == "__main__":
     import uvicorn
 

@@ -1,0 +1,47 @@
+# Blueprint de Render para el backend FastAPI de Urban Clothes.
+#
+# Uso: Render Dashboard -> New -> Blueprint -> selecciona este repositorio.
+# Render crea el servicio `urban-clothes-api` y pide los valores marcados con
+# `sync: false` (los mismos del .env del backend). No se sube ningún secreto al repo.
+
+services:
+  - type: web
+    name: urban-clothes-api
+    runtime: python
+    plan: free
+    rootDir: backend_python
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/salud
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: ENTORNO
+        value: production
+      # Supabase exige TLS. El backend usa un pool compatible con pgbouncer.
+      - key: DB_SSL
+        value: true
+      # 6543 = pooler en modo transacción de Supabase (igual que backend_python/.env).
+      # Usa 5432 solo si conectas al host directo de la base de datos.
+      - key: DB_PORT
+        value: 6543
+      - key: FRONTEND_URL
+        value: https://americanos-hh.netlify.app
+      # Secretos: se capturan en el panel de Render, nunca en el repositorio.
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      # Opcional: remitente verificado en Resend. Si se omite se usa
+      # "Americanoshh Support <onboarding@resend.dev>".
+      - key: RESEND_FROM
+        sync: false

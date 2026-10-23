@@ -1,9 +1,11 @@
-// Centraliza todas las llamadas al backend Node.js (Express + PostgreSQL/Supabase)
+// Centraliza todas las llamadas al backend FastAPI (Python + PostgreSQL/Supabase)
 
-// Detecta si la app se ejecuta en Netlify (producción) o en local, dirigiendo la petición directamente a Render
-const API_BASE = window.location.hostname.includes('netlify.app')
-  ? 'https://urban-clothes-slc0.onrender.com/api'
-  : '/api';
+// En desarrollo usa la ruta relativa `/api`, que el proxy de vite.config.js envía a
+// localhost:3000. En Netlify, netlify.toml redirige `/api/*` al backend de Render.
+// Para apuntar a otro backend sin tocar código, define VITE_API_URL en el build
+// (por ejemplo https://mi-servicio.onrender.com/api).
+const API_CONFIGURADA = import.meta.env.VITE_API_URL?.trim();
+const API_BASE = (API_CONFIGURADA || '/api').replace(/\/+$/, '');
 
 async function manejarRespuesta(respuesta) {
   const data = await respuesta.json().catch(() => ({}));

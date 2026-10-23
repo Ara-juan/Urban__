@@ -4,11 +4,12 @@
   command = "npm run build"
   publish = "dist"
 
-# 1. Redirige las llamadas /api al backend desplegado en Render
-#    (si cambias tu backend de URL, edita la línea "to")
+# 1. Redirige las llamadas /api al backend FastAPI desplegado en Render.
+#    Si creas el servicio con otro nombre en Render, actualiza el host de "to"
+#    (o define VITE_API_URL en Netlify para llamar a Render directamente).
 [[redirects]]
   from = "/api/*"
-  to = "https://urban-clothes-slc0.onrender.com/api/:splat"
+  to = "https://urban-clothes-api.onrender.com/api/:splat"
   status = 200
   force = true
 

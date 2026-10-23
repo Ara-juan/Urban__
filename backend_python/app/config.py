@@ -44,6 +44,8 @@ class Settings:
     db_ssl: bool
     jwt_secret: str
     resend_api_key: str
+    resend_from: str
+    frontend_url: str
     entorno: str
 
 
@@ -60,6 +62,16 @@ def cargar_settings() -> Settings:
         db_ssl=_booleano("DB_SSL", True),
         jwt_secret=os.getenv("JWT_SECRET", ""),
         resend_api_key=os.getenv("RESEND_API_KEY", ""),
+        # Remitente verificado en Resend. `onboarding@resend.dev` solo puede enviar
+        # al correo del dueño de la cuenta; para usuarios reales verifica un dominio.
+        resend_from=(
+            os.getenv("RESEND_FROM")
+            or "Americanoshh Support <onboarding@resend.dev>"
+        ).strip(),
+        # Origen del frontend, usado para armar el enlace del correo de recuperación.
+        frontend_url=(
+            os.getenv("FRONTEND_URL") or "https://americanos-hh.netlify.app"
+        ).strip().rstrip("/"),
         entorno=os.getenv("ENTORNO", "development"),
     )
 

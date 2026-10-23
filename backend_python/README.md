@@ -69,6 +69,8 @@ También se puede arrancar sin Uvicorn CLI: `python main.py`.
 | `DB_SSL` | no | `true` por defecto (Supabase). `false` solo para Postgres local sin TLS. |
 | `JWT_SECRET` | sí | Firma de los JWT. Sin ella el servidor **no arranca**. |
 | `RESEND_API_KEY` | para correo | API key de Resend. Sin ella, `/api/usuarios/recuperar-contrasena` responde 500. |
+| `RESEND_FROM` | no | Remitente del correo (`Nombre <correo@dominio>`). Por defecto `Americanoshh Support <onboarding@resend.dev>`. |
+| `FRONTEND_URL` | no | Origen del frontend para el enlace de recuperación. Por defecto `https://americanos-hh.netlify.app`. |
 | `ENTORNO` | no | `development` / `production`, informativo. |
 
 > El `.env` heredado del backend Node **no incluye** `RESEND_API_KEY`: añádela para que la
@@ -135,10 +137,34 @@ como hacía PostgreSQL a través de `pg`).
 
 ## Despliegue en Render
 
-- Build command: `pip install -r requirements.txt`
+El repositorio incluye [`../render.yaml`](../render.yaml), un blueprint que crea el servicio
+`urban-clothes-api` con `rootDir: backend_python` y estas órdenes:
+
+- Build command: `pip install --upgrade pip && pip install -r requirements.txt`
 - Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-- Define `DB_*`, `JWT_SECRET` y `RESEND_API_KEY` en el panel de Render.
-- `netlify.toml` ya redirige `/api/*` al backend de Render; no hay que tocar el frontend.
+- Health check: `GET /api/salud`
+- Python: `3.12.10` (variable `PYTHON_VERSION`)
+
+Pasos:
+
+1. Render Dashboard → **New → Blueprint** → elige este repositorio.
+2. Completa los valores `sync: false`: `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`,
+   `JWT_SECRET` y `RESEND_API_KEY` (cópialos de `backend_python/.env`).
+3. Deploy. La URL queda como `https://urban-clothes-api.onrender.com`.
+4. Si el nombre ya está ocupado, Render pedirá otro: actualiza entonces el host en
+   `netlify.toml` (o define `VITE_API_URL` en Netlify) y `FRONTEND_URL` en Render.
+
+Notas de producción:
+
+- El plan gratuito de Render suspende el servicio por inactividad; la primera petición
+  puede tardar ~50 s. El frontend mostrará el error de conexión hasta que despierte.
+- `DB_PORT=6543` corresponde al pooler en modo transacción de Supabase (el que ya usa
+  `backend_python/.env`). Con el host directo, usa `5432`.
+- `onboarding@resend.dev` de Resend solo entrega al correo del dueño de la cuenta. Para
+  enviar a cualquier usuario hay que verificar un dominio en Resend y poner ese remitente
+  en `RESEND_FROM`.
+- `netlify.toml` redirige `/api/*` a este servicio; el frontend no necesita configuración
+  adicional si se conserva la URL del blueprint.
 
 ## Verificación realizada
 
