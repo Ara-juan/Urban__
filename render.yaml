@@ -27,7 +27,7 @@ services:
       - key: DB_PORT
         value: "6543"
       - key: FRONTEND_URL
-        value: https://americanos-hh.netlify.app
+        value: https://boisterous-fox-77ad53.netlify.app
       # Secretos: se capturan en el panel de Render, nunca en el repositorio.
       - key: DB_USER
         sync: false
