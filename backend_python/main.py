@@ -42,10 +42,10 @@ app = FastAPI(
     lifespan=ciclo_de_vida,
 )
 
-# Mismos orígenes, métodos y cabeceras que configuró Express con `cors`.
+# Configuración estricta de CORS apuntando exclusivamente al frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[settings.frontend_url],
     allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
