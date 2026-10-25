@@ -1,4 +1,4 @@
-"""Pool de conexiones asíncronas a PostgreSQL (Supabase) con asyncpg."""
+"""pool de conexiones asincronas a postgresql (supabase) con asyncpg"""
 
 from __future__ import annotations
 
@@ -11,17 +11,22 @@ import asyncpg
 
 from app.config import settings
 
+# aca preparamos el registro de logs para los eventos de la base de datos
 logger = logging.getLogger("urban.db")
 
-# Equivalente al pool de `pg` en el backend Node: máximo 10 conexiones.
+# esto es igual al pool que teniamos en node permitimos maximo 10 conexiones al mismo tiempo para no saturar la base de datos
 MAX_CONEXIONES = 10
 
+# aca guardamos el pool una vez se crea para poder reutilizarlo
 _pool: asyncpg.Pool | None = None
+# usamos este cerrojo para evitar que multiples peticiones intenten crear el pool al mismo tiempo cuando apenas arranca el servidor
 _cerrojo = asyncio.Lock()
 
 
 def _contexto_ssl() -> ssl.SSLContext | None:
-    """SSL sin validar el certificado, igual que `ssl: { rejectUnauthorized: false }`."""
+    # esta funcion configura la seguridad de la conexion
+    # la dejamos sin validar el certificado para que conecte bien con supabase
+    # esto es exactamente lo mismo que hacer rejectunauthorized false en node
     if not settings.db_ssl:
         return None
 
@@ -32,7 +37,8 @@ def _contexto_ssl() -> ssl.SSLContext | None:
 
 
 async def obtener_pool() -> asyncpg.Pool:
-    """Crea el pool la primera vez que se necesita y lo reutiliza después."""
+    # aca creamos el pool de conexiones la primera vez que se necesita
+    # si ya existe simplemente lo devolvemos para no gastar recursos armando uno nuevo
     global _pool
 
     if _pool is not None:
@@ -50,8 +56,8 @@ async def obtener_pool() -> asyncpg.Pool:
                 min_size=1,
                 max_size=MAX_CONEXIONES,
                 timeout=15,
-                # El pooler de Supabase (pgbouncer en transaction mode) no admite
-                # prepared statements con nombre; `pg` en Node tampoco los usaba.
+                # le decimos que no use cache de sentencias preparadas porque el pooler de supabase no lo soporta bien
+                # en node tampoco usabamos sentencias con nombre asi que asi mantenemos la misma logica
                 statement_cache_size=0,
             )
             logger.info("Pool de PostgreSQL creado (máximo %s conexiones).", MAX_CONEXIONES)
@@ -60,6 +66,7 @@ async def obtener_pool() -> asyncpg.Pool:
 
 
 async def cerrar_pool() -> None:
+    # esta funcion sirve para apagar todo de forma limpia y cerrar las conexiones cuando se detenga el servidor
     global _pool
 
     if _pool is not None:
@@ -69,17 +76,20 @@ async def cerrar_pool() -> None:
 
 
 async def comprobar_conexion() -> None:
-    """Verificación de arranque: registra el mismo mensaje que el backend Node."""
+    # esto lo ejecutamos al iniciar la app para revisar que la base de datos si este viva y respondiendo
     try:
         pool = await obtener_pool()
+        # hacemos una consulta super sencilla y si funciona mandamos el mensaje de exito
         await pool.fetchval("SELECT 1")
         logger.info("¡Conexión exitosa a Supabase!")
-    except Exception as error:  # noqa: BLE001 - el servidor debe arrancar igual que en Node
+    except Exception as error:  # noqa: BLE001
+        # si algo explota mostramos el error en consola pero dejamos que la app siga viva igual que pasaba en el backend viejo
         logger.error("Error conectando a Supabase: %s", error)
 
 
 async def obtener_conexion() -> AsyncGenerator[asyncpg.Connection, None]:
-    """Dependencia de FastAPI: una conexión del pool por petición."""
+    # esta es la dependencia que usamos en las rutas de fastapi
+    # lo que hace es prestarle una conexion libre del pool a cada peticion que entra y al terminar la devuelve sola
     pool = await obtener_pool()
     async with pool.acquire() as conexion:
         yield conexion
