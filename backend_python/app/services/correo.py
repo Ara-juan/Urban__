@@ -1,4 +1,4 @@
-"""Envío del correo de recuperación mediante la API HTTP de Resend."""
+# envio del correo de recuperacion mediante la api http de resend
 
 from __future__ import annotations
 
@@ -8,20 +8,21 @@ import httpx
 
 from app.config import settings
 
+# preparamos esto para poder guardar en la consola cualquier error que pase con los correos
 logger = logging.getLogger("urban.correo")
 
+# aca guardamos la ruta de la api y el titulo que va a decir el correo cuando llegue
 RESEND_URL = "https://api.resend.com/emails"
 ASUNTO = "Recuperación de Contraseña — Americanoshh"
 
 
 def construir_enlace_recuperacion(token: str) -> str:
-    # FRONTEND_URL permite apuntar el enlace al dominio real de Netlify (o a uno propio).
+    # armamos el link completo apuntando al dominio del frontend para que el usuario pueda hacer click
     return f"{settings.frontend_url}/login?resetToken={token}"
 
 
 def construir_html_recuperacion(nombre: str | None, enlace: str) -> str:
-    # Se mantiene el mismo maquetado inline del backend Node para que se vea
-    # igual en Outlook, Gmail y Apple Mail.
+    # este es el diseño completo del correo metido en html para que se vea igual de bien en cualquier lado
     return f"""
       <div style="font-family: Arial, sans-serif; background-color: #121212; color: #ffffff; padding: 25px; border-radius: 10px;">
         <h2 style="color: #007BFF; text-align: center;">Americanoshh</h2>
@@ -44,13 +45,14 @@ def construir_html_recuperacion(nombre: str | None, enlace: str) -> str:
 
 
 async def enviar_correo_recuperacion(destinatario: str, nombre: str | None, enlace: str) -> None:
-    """Llama a Resend y lanza una excepción si el envío falla (igual que en Node)."""
+    # primero comprobamos que la llave de resend si este configurada porque sin eso todo falla
     if not settings.resend_api_key:
         logger.error(
             "RESEND_API_KEY no está configurada: no se puede enviar el correo de recuperación."
         )
         raise RuntimeError("RESEND_API_KEY no está configurada en el servidor.")
 
+    # alistamos los datos de envio con quien manda a quien le llega y el diseño del correo
     cuerpo = {
         "from": settings.resend_from,
         "to": [destinatario],
@@ -62,9 +64,11 @@ async def enviar_correo_recuperacion(destinatario: str, nombre: str | None, enla
         "Authorization": f"Bearer {settings.resend_api_key}",
     }
 
+    # disparamos la peticion al servidor y le ponemos un tiempo maximo de espera para que no se quede bloqueado
     async with httpx.AsyncClient(timeout=15) as cliente:
         respuesta = await cliente.post(RESEND_URL, headers=cabeceras, json=cuerpo)
 
+    # si la api nos bota un error lo intentamos leer para ver que paso y lanzamos la alerta
     if respuesta.status_code >= 400:
         try:
             detalle = respuesta.json()
