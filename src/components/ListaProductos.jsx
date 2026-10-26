@@ -12,7 +12,7 @@ export default function ListaProductos({ productos, cargando, error, onVerDetall
   // Evaluamos primero las condiciones de red antes de aplicar filtros o procesar la lista
   // 1. Mensaje visual mientras la petición a la base de datos o API sigue pendiente.
   if (cargando) {
-    return <div className="text-center w-100 py-4 text-muted" role="alert" aria-live="polite">Cargando productos del catálogo...</div>;
+    return <div className="text-center w-100 py-4 text-white" role="alert" aria-live="polite">Cargando productos del catálogo...</div>;
   }
   
   // 2. Mensaje de advertencia si falló la conexión con el servidor
@@ -28,10 +28,10 @@ export default function ListaProductos({ productos, cargando, error, onVerDetall
   if (productosFiltrados.length === 0) {
     // Primer caso; el usuario aplico filtros que no arrojan coincidencias
     if (busqueda.trim() !== '' || precioMax !== 'all') {
-      return <div className="text-center w-100 py-4 text-muted" role="status">No hay prendas que coincidan con la búsqueda.</div>;
+      return <div className="text-center w-100 py-4 text-white" role="status">No hay prendas que coincidan con la búsqueda.</div>;
     }
     // segundo caso; La categoría o catalogo directamente no tienen items registrados
-    return <div className="text-center w-100 py-4 text-muted" role="status">No hay prendas disponibles en esta categoría por el momento.</div>;
+    return <div className="text-center w-100 py-4 text-white" role="status">No hay prendas disponibles en esta categoría por el momento.</div>;
   }
 
   return (
