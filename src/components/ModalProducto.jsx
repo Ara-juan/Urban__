@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import './ModalProducto.css';
 
-const WHATSAPP_URL = 'https://wa.me/573124363561';
+// Guardamos solo el número de teléfono base en una constante
+const NUMERO_WHATSAPP = '573124363561';
 
 export default function ModalProducto({ producto, onCerrar }) {
   // guarda la talla que el usuario clica en el modal
@@ -22,6 +23,13 @@ export default function ModalProducto({ producto, onCerrar }) {
 
   if (!producto) return null;
   const precioFormateado = `$${parseInt(producto.precio, 10).toLocaleString('es-CO')}`;
+
+  // Armamos el mensaje dinámico para WhatsApp incluyendo el nombre del producto y la talla si fue seleccionada
+  const textoTalla = tallaSeleccionada ? ` (Talla: ${tallaSeleccionada})` : '';
+  const mensajePrearmado = `Hola, estoy interesado en el producto ${producto.titulo}${textoTalla}, quiero tener más información sobre el producto.`;
+  
+  // Codificamos el mensaje para que los espacios y caracteres no rompan el enlace web
+  const urlWhatsappDinamica = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensajePrearmado)}`;
 
   // seo avanzado: construimos la metadata estructurada para los rich snippets de google
   const productSchema = {
@@ -102,7 +110,8 @@ export default function ModalProducto({ producto, onCerrar }) {
 
             <button type="button" className="btn-buy" aria-label="comprar producto a través de whatsapp">
               <span>
-                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">Compra Ahora</a>
+                {/* Aquí inyectamos la URL dinámica que generamos arriba */}
+                <a href={urlWhatsappDinamica} target="_blank" rel="noopener noreferrer">Compra Ahora</a>
               </span>
             </button>
 
