@@ -81,7 +81,6 @@ export default function Navbar() {
             <option value="50000">Hasta $50.000</option>
             <option value="60000">Hasta $60.000</option>
           </select>
-          <button type="submit" aria-label="iniciar búsqueda">🔍</button>
         </form>
 
         {/* zona de perfil, botones de login o administración */}
