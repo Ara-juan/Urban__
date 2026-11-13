@@ -66,8 +66,11 @@ async def registrar_usuario(
         raise ApiError(400, "El campo teléfono solo debe contener números.")
 
     # validamos que el usuario haya aceptado expresamente el tratamiento de datos
-    if not datos.acepto_politica:
-        raise ApiError(400, "Debes aceptar la política de tratamiento de datos personales.")
+    if datos.acepto_politica is not True:
+        raise ApiError(
+            400,
+            "Es obligatorio aceptar la política de tratamiento de datos personales para registrarse.",
+        )
 
     try:
         # aca metemos al usuario nuevo a la base de datos y le encriptamos la clave

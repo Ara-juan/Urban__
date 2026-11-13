@@ -30,7 +30,7 @@ export default function Login() {
     }
   }, [resetToken]);
 
-  // si el usuario abre el modal legal desde el enlace y pulsa "Aceptar", marcamos la casilla automáticamente
+  // si el usuario acepta desde el modal legal, marcamos automáticamente la casilla del registro
   useEffect(() => {
     const alAceptar = () => setAceptoPolitica(true);
     window.addEventListener('privacidad-aceptada', alAceptar);
@@ -40,6 +40,17 @@ export default function Login() {
   const mostrarMensaje = (texto, esError = false) => {
     setMensaje(texto);
     setMensajeError(esError);
+  };
+
+  // cambia a la pestaña de registro y abre el anuncio legal si aún no lo ha aceptado
+  const abrirPestañaRegistro = () => {
+    setPestañaActiva('register');
+    setMensaje(null);
+
+    const yaAceptoAntes = localStorage.getItem('americanoshh_privacidad_aceptada') === 'true';
+    if (!yaAceptoAntes && !aceptoPolitica) {
+      window.dispatchEvent(new Event('abrir-politica-privacidad'));
+    }
   };
 
   const manejarLogin = async (event) => {
@@ -70,8 +81,9 @@ export default function Login() {
     event.preventDefault();
     setMensaje(null);
 
+    // doble barrera de seguridad en frontend
     if (!aceptoPolitica) {
-      mostrarMensaje('Debes autorizar el tratamiento de tus datos personales para crear una cuenta.', true);
+      mostrarMensaje('Debes aceptar la política de tratamiento de datos para registrarte.', true);
       return;
     }
 
@@ -84,7 +96,7 @@ export default function Login() {
       contrasena: formData.get('contrasena'),
       telefono: formData.get('telefono') || null,
       direccion: formData.get('direccion') || null,
-      acepto_politica: aceptoPolitica
+      acepto_politica: true
     };
 
     try {
@@ -144,7 +156,6 @@ export default function Login() {
   };
 
   return (
-    // reemplazamos div por main y añadimos el seo básico
     <main className="login-container">
       <title>Ingresar o Registrarse | Americanoshh</title>
       <meta name="description" content="inicia sesión en americanoshh para gestionar tu perfil y acceder a streetwear exclusivo." />
@@ -170,7 +181,7 @@ export default function Login() {
               role="tab"
               aria-selected={pestañaActiva === 'register'}
               className={`tab ${pestañaActiva === 'register' ? 'active' : ''}`}
-              onClick={() => { setPestañaActiva('register'); setMensaje(null); }}
+              onClick={abrirPestañaRegistro}
             >
               Registrarse
             </button>
@@ -185,8 +196,27 @@ export default function Login() {
             <button type="submit" className="btn" disabled={cargando}>
               {cargando ? 'ingresando...' : 'Ingresar'}
             </button>
-            <p className="link">¿No tienes cuenta? <span role="button" tabIndex="0" onKeyDown={(e) => e.key === 'Enter' && setPestañaActiva('register')} onClick={() => { setPestañaActiva('register'); setMensaje(null); }}>Regístrate aquí</span></p>
-            <p className="link"><span role="button" tabIndex="0" onKeyDown={(e) => e.key === 'Enter' && setPestañaActiva('forgot')} onClick={() => { setPestañaActiva('forgot'); setMensaje(null); }}>¿Olvidaste tu contraseña?</span></p>
+            <p className="link">
+              ¿No tienes cuenta?{' '}
+              <span
+                role="button"
+                tabIndex="0"
+                onKeyDown={(e) => e.key === 'Enter' && abrirPestañaRegistro()}
+                onClick={abrirPestañaRegistro}
+              >
+                Regístrate aquí
+              </span>
+            </p>
+            <p className="link">
+              <span
+                role="button"
+                tabIndex="0"
+                onKeyDown={(e) => e.key === 'Enter' && setPestañaActiva('forgot')}
+                onClick={() => { setPestañaActiva('forgot'); setMensaje(null); }}
+              >
+                ¿Olvidaste tu contraseña?
+              </span>
+            </p>
           </form>
         )}
 
@@ -208,7 +238,7 @@ export default function Login() {
                 required
               />
               <span>
-                Autorizo el tratamiento de mis datos personales según la{' '}
+                Acepto de forma obligatoria el tratamiento de mis datos personales según la{' '}
                 <button
                   type="button"
                   className="enlace-politica-inline"
@@ -220,10 +250,30 @@ export default function Login() {
               </span>
             </label>
 
-            <button type="submit" className="btn" disabled={cargando}>
+            {!aceptoPolitica && (
+              <p className="aviso-obligatorio-registro">
+                * Debes marcar la casilla de autorización para habilitar el registro.
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="btn"
+              disabled={cargando || !aceptoPolitica}
+              title={!aceptoPolitica ? 'Acepta la política de datos para continuar' : ''}
+            >
               {cargando ? 'registrando...' : 'Registrarse'}
             </button>
-            <p className="link" role="button" tabIndex="0" onKeyDown={(e) => e.key === 'Enter' && setPestañaActiva('login')} onClick={() => { setPestañaActiva('login'); setMensaje(null); }}>¿Ya tienes cuenta? Inicia sesión</p>
+
+            <p
+              className="link"
+              role="button"
+              tabIndex="0"
+              onKeyDown={(e) => e.key === 'Enter' && setPestañaActiva('login')}
+              onClick={() => { setPestañaActiva('login'); setMensaje(null); }}
+            >
+              ¿Ya tienes cuenta? Inicia sesión
+            </p>
           </form>
         )}
 
@@ -237,7 +287,15 @@ export default function Login() {
             <button type="submit" className="btn" disabled={cargando}>
               {cargando ? 'enviando...' : 'Enviar Enlace'}
             </button>
-            <p className="link" role="button" tabIndex="0" onKeyDown={(e) => e.key === 'Enter' && setPestañaActiva('login')} onClick={() => { setPestañaActiva('login'); setMensaje(null); }}>Volver al inicio de sesión</p>
+            <p
+              className="link"
+              role="button"
+              tabIndex="0"
+              onKeyDown={(e) => e.key === 'Enter' && setPestañaActiva('login')}
+              onClick={() => { setPestañaActiva('login'); setMensaje(null); }}
+            >
+              Volver al inicio de sesión
+            </p>
           </form>
         )}
 
