@@ -182,10 +182,13 @@ export default function AvisoPrivacidad() {
               </div>
             ) : (
               <div className="modal-privacidad-cuerpo">
-                <h3>1. Naturaleza del catálogo y precios</h3>
+                <h3>1. Modalidad de Impresión bajo Demanda y Tiempos de Envío</h3>
                 <ul>
                   <li>
-                    Este sitio web funciona como <strong>catálogo virtual oficial de Americanoshh</strong>. La selección de una prenda redirige a nuestro canal oficial de atención en WhatsApp (<code>+57 312 436 3561</code>) para confirmar disponibilidad en tiempo real, método de pago y costo de envío.
+                    Los productos publicados en el catálogo de <strong>Americanoshh</strong> se elaboran bajo la modalidad de <strong>impresión bajo demanda (Print-on-Demand)</strong>. No manejamos inventario físico pre-estampado; la disponibilidad depende de que el diseño se encuentre activo en el catálogo.
+                  </li>
+                  <li>
+                    Debido a que cada prenda se estampa y prepara exclusivamente tras confirmarse el pedido, <strong>el tiempo de despacho y envío puede tardar unos días hábiles adicionales</strong> respecto a productos de entrega inmediata. El plazo estimado exacto se informa por WhatsApp (<code>+57 312 436 3561</code>) antes de concretar el pago.
                   </li>
                   <li>
                     Todos los precios publicados están expresados en <strong>pesos colombianos (COP)</strong>. El valor del domicilio o envío nacional se informa antes de confirmar la compra.
@@ -194,22 +197,22 @@ export default function AvisoPrivacidad() {
 
                 <h3>2. Derecho de Retracto (Art. 47, Ley 1480 de 2011)</h3>
                 <p>
-                  Al tratarse de ventas a distancia, el comprador podrá ejercer el derecho de retracto dentro de los <strong>cinco (5) días hábiles</strong> siguientes a la entrega de la prenda. El producto debe devolverse en las mismas condiciones en que fue recibido (sin uso, sin lavar, sin olores y con sus etiquetas originales intactas). Los costos de transporte de la devolución corren por cuenta del consumidor, y el reembolso se realizará en un plazo máximo de 30 días calendario.
+                  Para referencias estándar del catálogo, el comprador podrá ejercer el derecho de retracto dentro de los <strong>cinco (5) días hábiles</strong> siguientes a la entrega de la prenda, siempre que se devuelva sin uso, sin lavar, sin olores y con sus etiquetas originales intactas (asumiendo el consumidor los costos de transporte de devolución). Conforme al numeral 3 del Art. 47 de la Ley 1480 de 2011, el retracto no aplica cuando el cliente solicite diseños personalizados a medida fuera del catálogo estándar.
                 </p>
 
                 <h3>3. Cambios por talla y Garantía Legal (Art. 7, Ley 1480 de 2011)</h3>
                 <ul>
                   <li>
-                    <strong>Cambios por talla:</strong> Pueden solicitarse dentro de los 5 días hábiles posteriores a la entrega, sujetos a disponibilidad de inventario y siempre que la prenda conserve sus etiquetas y estado original.
+                    <strong>Cambios por talla:</strong> Pueden solicitarse dentro de los 5 días hábiles posteriores a la entrega, siempre que la prenda conserve sus etiquetas y estado original, sujeto a los tiempos de producción de la nueva talla.
                   </li>
                   <li>
-                    <strong>Garantía por defectos de calidad:</strong> Todas nuestras prendas cuentan con garantía legal de <strong>30 días calendario</strong> por defectos de fabricación (costuras, cremalleras o estampados). No cubre daños ocasionados por lavado inadecuado, uso indebido o desgaste normal.
+                    <strong>Garantía por defectos de calidad:</strong> Todas nuestras prendas cuentan con garantía legal de <strong>30 días calendario</strong> por defectos de fabricación o estampado. No cubre daños ocasionados por lavado inadecuado, planchado directo sobre el estampado, uso indebido o desgaste normal.
                   </li>
                 </ul>
 
                 <h3>4. Propiedad Intelectual y Protección al Consumidor</h3>
                 <p>
-                  Las fotografías, logotipos, diseños gráficos y la marca <strong>Americanoshh</strong> están protegidos por las normas de propiedad intelectual vigentes en Colombia; queda prohibida su reproducción comercial sin autorización. Para peticiones, quejas o reclamos (PQR) contáctanos en nuestro WhatsApp oficial, o consulta tus derechos ante la{' '}
+                  Las fotografías, logotipos, ilustraciones y la marca <strong>Americanoshh</strong> están protegidos por las normas de propiedad intelectual vigentes en Colombia; queda prohibida su reproducción comercial sin autorización. Para peticiones, quejas o reclamos (PQR) contáctanos en nuestro WhatsApp oficial, o consulta tus derechos ante la{' '}
                   <a
                     href="https://www.sic.gov.co"
                     target="_blank"

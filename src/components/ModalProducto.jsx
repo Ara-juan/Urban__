@@ -26,7 +26,7 @@ export default function ModalProducto({ producto, onCerrar }) {
 
   // Armamos el mensaje dinámico para WhatsApp incluyendo el nombre del producto y la talla si fue seleccionada
   const textoTalla = tallaSeleccionada ? ` (Talla: ${tallaSeleccionada})` : '';
-  const mensajePrearmado = `Hola, estoy interesado en el producto ${producto.titulo}${textoTalla}, quiero tener más información sobre el producto.`;
+  const mensajePrearmado = `Hola, estoy interesado en el producto ${producto.titulo}${textoTalla} (impresión bajo demanda), quiero tener más información sobre tiempos de entrega y pedido.`;
   
   // Codificamos el mensaje para que los espacios y caracteres no rompan el enlace web
   const urlWhatsappDinamica = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensajePrearmado)}`;
@@ -37,7 +37,7 @@ export default function ModalProducto({ producto, onCerrar }) {
     "@type": "Product",
     "name": producto.titulo,
     "image": producto.imagen_url,
-    "description": producto.descripcion || "prenda de estilo urbano americanoshh",
+    "description": producto.descripcion || "prenda de estilo urbano americanoshh fabricada bajo demanda",
     "brand": {
       "@type": "Brand",
       "name": "Americanoshh"
@@ -46,7 +46,7 @@ export default function ModalProducto({ producto, onCerrar }) {
       "@type": "Offer",
       "priceCurrency": "COP",
       "price": producto.precio,
-      "availability": "https://schema.org/InStock",
+      "availability": "https://schema.org/MadeToOrder",
       "url": window.location.href
     }
   };
@@ -88,7 +88,12 @@ export default function ModalProducto({ producto, onCerrar }) {
           <div className="modal-right">
             {/* id dinámico para el aria-labelledby del contenedor del modal */}
             <h2 id="modal-titulo" className="urban-title">{producto.titulo}</h2>
-            <p className="modal-stock" aria-live="polite">En stock</p>
+
+            <p className="modal-stock" aria-live="polite">
+              <span className="badge-pod">Impresión bajo demanda</span>
+              <span className="estado-activo"> • Diseño activo</span>
+            </p>
+
             <p className="modal-price" aria-label={`precio: ${precioFormateado}`}>{precioFormateado} COP</p>
 
             <div className="modal-sizes" role="group" aria-label="selección de talla">
@@ -108,6 +113,11 @@ export default function ModalProducto({ producto, onCerrar }) {
               </div>
             </div>
 
+            {/* aviso explícito sobre producción bajo demanda y tiempos de envío */}
+            <div className="aviso-pod-modal" role="note">
+              <strong>Prenda bajo demanda:</strong> No manejamos stock pre-estampado; tu camiseta se produce especialmente al confirmar el pedido, por lo que su despacho y envío puede tardar unos días adicionales.
+            </div>
+
             <button type="button" className="btn-buy" aria-label="comprar producto a través de whatsapp">
               <span>
                 {/* Aquí inyectamos la URL dinámica que generamos arriba */}
@@ -118,13 +128,13 @@ export default function ModalProducto({ producto, onCerrar }) {
             <p className="modal-desc">{producto.descripcion || 'sin descripción disponible.'}</p>
 
             <p className="modal-nota-legal">
-              Precio en pesos colombianos (COP). El envío y disponibilidad se confirman por WhatsApp. Consulta nuestras{' '}
+              Precio en pesos colombianos (COP). Tiempos de producción bajo demanda y valor de envío se confirman por WhatsApp. Consulta nuestras{' '}
               <button
                 type="button"
                 className="modal-enlace-legal"
                 onClick={() => window.dispatchEvent(new CustomEvent('abrir-centro-legal', { detail: 'terminos' }))}
               >
-                condiciones de garantía, cambios y retracto
+                condiciones de producción, garantía y retracto
               </button>
               .
             </p>

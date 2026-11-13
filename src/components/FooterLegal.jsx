@@ -11,7 +11,7 @@ export default function FooterLegal() {
         <div className="footer-legal-marca">
           <strong>AMERICANOSHH • URBAN CLOTHES</strong>
           <p>
-            Catálogo oficial de moda urbana • Precios en COP • Atención y pedidos vía WhatsApp (+57 312 436 3561)
+            Catálogo oficial de moda urbana • Impresión bajo demanda • Precios en COP • Pedidos vía WhatsApp (+57 312 436 3561)
           </p>
         </div>
 
@@ -29,7 +29,7 @@ export default function FooterLegal() {
             className="footer-legal-btn"
             onClick={() => abrirSeccionLegal('terminos')}
           >
-            Términos, Garantías y Derecho de Retracto
+            Términos, Producción y Garantías
           </button>
           <span className="separador-footer">•</span>
           <a

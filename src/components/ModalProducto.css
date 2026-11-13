@@ -87,15 +87,36 @@
   font-family: 'Times New Roman', Times, serif;
   font-size: 32px;
   margin-top: 0;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   letter-spacing: 1px;
 }
 
-/* texto discreto para mostrar las unidades disponibles */
+/* etiqueta de disponibilidad e impresión bajo demanda */
 .modal-stock {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
   color: #ccc;
-  font-size: 16px;
-  margin-bottom: 15px;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.badge-pod {
+  background: rgba(0, 255, 204, 0.12);
+  color: #00ffcc;
+  border: 1px solid rgba(0, 255, 204, 0.35);
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.estado-activo {
+  color: #b8b8b8;
+  font-size: 13.5px;
 }
 
 /* precio destacado en blanco y letra grande */
@@ -103,7 +124,7 @@
   font-size: 26px;
   font-weight: bold;
   color: #ffffff;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 /* subtitulo para las secciones internas como las tallas */
@@ -117,7 +138,7 @@
 .sizes-grid {
   display: flex;
   gap: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 /* cuadritos para seleccionar la talla con fondo transparente */
@@ -144,6 +165,22 @@
   outline: 2px solid #ffffff66;
 }
 
+/* recuadro informativo sobre tiempos de producción bajo demanda */
+.aviso-pod-modal {
+  background: rgba(77, 163, 255, 0.1);
+  border-left: 3px solid #00ffcc;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #e0e0e0;
+  margin-bottom: 22px;
+}
+
+.aviso-pod-modal strong {
+  color: #00ffcc;
+}
+
 /* boton de comprar azul con estilo inclinado */
 .btn-buy {
   background: #0040ff;
@@ -157,7 +194,7 @@
   transform: skewX(-20deg);
   box-shadow: 0 4px 15px rgba(0, 64, 255, 0.4);
   transition: background 0.3s ease;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 /* azul mas oscuro cuando pasas el cursor */
