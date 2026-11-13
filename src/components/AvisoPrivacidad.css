@@ -1,0 +1,237 @@
+/* banner inferior fijo */
+.aviso-privacidad-banner {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 1050px;
+  z-index: 1100;
+  background: rgba(15, 15, 15, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 18px 24px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65);
+  animation: subirAviso 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.aviso-privacidad-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.aviso-privacidad-texto strong {
+  display: block;
+  font-size: 15px;
+  color: #ffffff;
+  margin-bottom: 4px;
+  letter-spacing: 0.4px;
+}
+
+.aviso-privacidad-texto p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #cccccc;
+}
+
+.aviso-privacidad-texto span {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-ver-politica {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #00ffcc;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.btn-ver-politica:hover {
+  color: #33ffdb;
+  text-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
+}
+
+.aviso-privacidad-acciones {
+  flex-shrink: 0;
+}
+
+.btn-aceptar-privacidad {
+  background: var(--bs-primary, #4da3ff);
+  color: #111111;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(77, 163, 255, 0.3);
+}
+
+.btn-aceptar-privacidad:hover {
+  background: #338cf0;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* modal completo de política de privacidad */
+.modal-privacidad-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeInPrivacidad 0.25s ease;
+}
+
+.modal-privacidad-caja {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(18, 18, 18, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 30px;
+  color: #ffffff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+}
+
+.cerrar-modal-privacidad {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: #aaaaaa;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cerrar-modal-privacidad:hover {
+  color: #00ffcc;
+}
+
+.modal-privacidad-caja h2 {
+  margin: 0 0 4px 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.subtitulo-legal {
+  margin: 0 0 18px 0;
+  font-size: 13px;
+  color: #00ffcc;
+}
+
+.modal-privacidad-cuerpo {
+  overflow-y: auto;
+  padding-right: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d6d6d6;
+}
+
+.modal-privacidad-cuerpo h3 {
+  font-size: 15.5px;
+  color: #ffffff;
+  margin: 16px 0 6px 0;
+}
+
+.modal-privacidad-cuerpo ul {
+  padding-left: 20px;
+  margin: 0 0 10px 0;
+}
+
+.modal-privacidad-cuerpo li {
+  margin-bottom: 6px;
+}
+
+.modal-privacidad-cuerpo code {
+  color: #00ffcc;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.modal-privacidad-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secundario-privacidad {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cccccc;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-secundario-privacidad:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+@keyframes subirAviso {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 25px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes fadeInPrivacidad {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .aviso-privacidad-contenido {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .btn-aceptar-privacidad {
+    width: 100%;
+  }
+
+  .modal-privacidad-caja {
+    padding: 22px 18px;
+  }
+
+  .modal-privacidad-footer {
+    flex-direction: column-reverse;
+  }
+
+  .modal-privacidad-footer button {
+    width: 100%;
+  }
+}
