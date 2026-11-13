@@ -89,7 +89,7 @@ export default function ModalProducto({ producto, onCerrar }) {
             {/* id dinámico para el aria-labelledby del contenedor del modal */}
             <h2 id="modal-titulo" className="urban-title">{producto.titulo}</h2>
             <p className="modal-stock" aria-live="polite">En stock</p>
-            <p className="modal-price" aria-label={`precio: ${precioFormateado}`}>{precioFormateado}</p>
+            <p className="modal-price" aria-label={`precio: ${precioFormateado}`}>{precioFormateado} COP</p>
 
             <div className="modal-sizes" role="group" aria-label="selección de talla">
               <h3 className="urban-subtitle">Tallas</h3>
@@ -116,6 +116,18 @@ export default function ModalProducto({ producto, onCerrar }) {
             </button>
 
             <p className="modal-desc">{producto.descripcion || 'sin descripción disponible.'}</p>
+
+            <p className="modal-nota-legal">
+              Precio en pesos colombianos (COP). El envío y disponibilidad se confirman por WhatsApp. Consulta nuestras{' '}
+              <button
+                type="button"
+                className="modal-enlace-legal"
+                onClick={() => window.dispatchEvent(new CustomEvent('abrir-centro-legal', { detail: 'terminos' }))}
+              >
+                condiciones de garantía, cambios y retracto
+              </button>
+              .
+            </p>
           </div>
         </div>
       </div>
