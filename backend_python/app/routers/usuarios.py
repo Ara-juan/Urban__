@@ -65,6 +65,10 @@ async def registrar_usuario(
     if datos.telefono and not TELEFONO_REGEX.match(datos.telefono):
         raise ApiError(400, "El campo teléfono solo debe contener números.")
 
+    # validamos que el usuario haya aceptado expresamente el tratamiento de datos
+    if not datos.acepto_politica:
+        raise ApiError(400, "Debes aceptar la política de tratamiento de datos personales.")
+
     try:
         # aca metemos al usuario nuevo a la base de datos y le encriptamos la clave
         fila = await conexion.fetchrow(

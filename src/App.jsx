@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
+import AvisoPrivacidad from './components/AvisoPrivacidad.jsx';
 import Inicio from './pages/Inicio.jsx';
 import Colecciones from './pages/Colecciones.jsx';
 import Catalogo from './pages/Catalogo.jsx';
@@ -36,6 +37,9 @@ export default function App() {
         {/* si el usuario se inventa una url o escribe mal, lo devolvemos al inicio */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {/* anuncio legal de tratamiento de datos visible al ingresar */}
+      <AvisoPrivacidad />
     </>
   );
 }

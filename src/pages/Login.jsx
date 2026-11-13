@@ -19,6 +19,7 @@ export default function Login() {
   const [mensaje, setMensaje] = useState(null);
   const [mensajeError, setMensajeError] = useState(false);
   const [cargando, setCargando] = useState(false);
+  const [aceptoPolitica, setAceptoPolitica] = useState(false);
 
   const { iniciarSesionLocal } = useAuth();
   const navigate = useNavigate();
@@ -28,6 +29,13 @@ export default function Login() {
       setPestañaActiva('reset');
     }
   }, [resetToken]);
+
+  // si el usuario abre el modal legal desde el enlace y pulsa "Aceptar", marcamos la casilla automáticamente
+  useEffect(() => {
+    const alAceptar = () => setAceptoPolitica(true);
+    window.addEventListener('privacidad-aceptada', alAceptar);
+    return () => window.removeEventListener('privacidad-aceptada', alAceptar);
+  }, []);
 
   const mostrarMensaje = (texto, esError = false) => {
     setMensaje(texto);
@@ -61,6 +69,12 @@ export default function Login() {
   const manejarRegistro = async (event) => {
     event.preventDefault();
     setMensaje(null);
+
+    if (!aceptoPolitica) {
+      mostrarMensaje('Debes autorizar el tratamiento de tus datos personales para crear una cuenta.', true);
+      return;
+    }
+
     setCargando(true);
 
     const formData = new FormData(event.target);
@@ -69,13 +83,15 @@ export default function Login() {
       email: formData.get('email'),
       contrasena: formData.get('contrasena'),
       telefono: formData.get('telefono') || null,
-      direccion: formData.get('direccion') || null
+      direccion: formData.get('direccion') || null,
+      acepto_politica: aceptoPolitica
     };
 
     try {
       const resultado = await registrarUsuario(datos);
       mostrarMensaje(resultado.mensaje, false);
       event.target.reset();
+      setAceptoPolitica(false);
 
       setTimeout(() => setPestañaActiva('login'), 1500);
     } catch (error) {
@@ -182,6 +198,28 @@ export default function Login() {
             <input type="password" name="contrasena" aria-label="crear contraseña" placeholder="Contraseña (Mín. 8 caracteres)" minLength={8} required />
             <input type="tel" name="telefono" aria-label="teléfono opcional" placeholder="Teléfono (opcional, solo números)" pattern="^[0-9]*$" />
             <input type="text" name="direccion" aria-label="dirección opcional" placeholder="Dirección (opcional)" />
+
+            <label className="privacidad-check">
+              <input
+                type="checkbox"
+                name="acepto_politica"
+                checked={aceptoPolitica}
+                onChange={(e) => setAceptoPolitica(e.target.checked)}
+                required
+              />
+              <span>
+                Autorizo el tratamiento de mis datos personales según la{' '}
+                <button
+                  type="button"
+                  className="enlace-politica-inline"
+                  onClick={() => window.dispatchEvent(new Event('abrir-politica-privacidad'))}
+                >
+                  Política de Privacidad
+                </button>
+                .
+              </span>
+            </label>
+
             <button type="submit" className="btn" disabled={cargando}>
               {cargando ? 'registrando...' : 'Registrarse'}
             </button>

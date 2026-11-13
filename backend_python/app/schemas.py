@@ -17,6 +17,7 @@ class RegistroUsuarioRequest(ModeloPeticion):
     contrasena: str | None = None
     telefono: str | None = None
     direccion: str | None = None
+    acepto_politica: bool | None = None
 
 # lo basico que necesitamos para validar que si puedan iniciar sesion
 class LoginRequest(ModeloPeticion):
