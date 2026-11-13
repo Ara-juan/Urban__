@@ -40,6 +40,11 @@ class ActualizarPerfilRequest(ModeloPeticion):
     telefono: str | None = None
     direccion: str | None = None
 
+# modelo para que el administrador pueda bloquear o desbloquear cuentas
+class BloqueoUsuarioRequest(ModeloPeticion):
+    bloqueado: bool
+    motivo: str | None = None
+
 # toda la informacion que debe llevar un producto nuevo que vayan a subir a la tienda
 class CrearProductoRequest(ModeloPeticion):
     titulo: str | None = None

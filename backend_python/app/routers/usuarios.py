@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends
 from app.database import obtener_conexion
 from app.schemas import (
     ActualizarPerfilRequest,
+    BloqueoUsuarioRequest,
     LoginRequest,
     RecuperarContrasenaRequest,
     RegistroUsuarioRequest,
@@ -22,6 +23,7 @@ from app.security import (
     ApiError,
     DURACION_TOKEN_RECUPERACION,
     DURACION_TOKEN_SESION,
+    administrador_requerido,
     crear_token,
     decodificar_token,
     es_administrador,
@@ -111,7 +113,10 @@ async def iniciar_sesion(
     try:
         # buscamos al usuario usando su correo
         usuario = await conexion.fetchrow(
-            "SELECT id_usuario, nombre, email, contrasena, rol FROM usuarios WHERE email = $1",
+            """
+            SELECT id_usuario, nombre, email, contrasena, rol, bloqueado, motivo_bloqueo
+            FROM usuarios WHERE email = $1
+            """,
             datos.email,
         )
 
@@ -122,6 +127,18 @@ async def iniciar_sesion(
         # revisamos que la clave que escribio coincida con la que tenemos guardada
         if not verificar_contrasena(datos.contrasena, usuario["contrasena"]):
             raise ApiError(401, "Contraseña incorrecta.")
+
+        # si la cuenta fue bloqueada por el administrador impedimos el acceso
+        if usuario["bloqueado"]:
+            motivo = (
+                f" Motivo: {usuario['motivo_bloqueo']}"
+                if usuario["motivo_bloqueo"]
+                else ""
+            )
+            raise ApiError(
+                403,
+                f"Tu cuenta ha sido bloqueada por un administrador.{motivo}",
+            )
 
         # si todo salio bien le armamos un token para que navegue sin estar iniciando sesion a cada rato
         token = crear_token(
@@ -162,12 +179,18 @@ async def recuperar_contrasena(
     try:
         # primero miramos si el correo si lo tenemos registrado
         consulta = await conexion.fetchrow(
-            "SELECT id_usuario, nombre FROM usuarios WHERE email = $1",
+            "SELECT id_usuario, nombre, bloqueado FROM usuarios WHERE email = $1",
             datos.email,
         )
         if consulta is None:
             raise ApiError(
                 404, "No existe ninguna cuenta registrada con este correo."
+            )
+
+        if consulta["bloqueado"]:
+            raise ApiError(
+                403,
+                "Esta cuenta se encuentra bloqueada y no puede solicitar recuperación.",
             )
 
         # le generamos un token temporal para que pueda cambiar la clave seguro
@@ -323,6 +346,84 @@ async def actualizar_perfil(
     except Exception as error:  # noqa: BLE001
         logger.exception("Error al actualizar el perfil: %s", error)
         raise ApiError(500, "Error interno al actualizar la información.") from error
+
+
+@router.get("")
+async def listar_usuarios(
+    _: dict[str, Any] = Depends(administrador_requerido),
+    conexion: asyncpg.Connection = Depends(obtener_conexion),
+) -> list[dict[str, Any]]:
+    # lista todos los usuarios registrados para que el administrador pueda gestionarlos
+    try:
+        filas = await conexion.fetch(
+            """
+            SELECT id_usuario, nombre, email, telefono, direccion, rol,
+                   fecha_registro, bloqueado, motivo_bloqueo, fecha_bloqueo
+            FROM usuarios
+            ORDER BY id_usuario DESC
+            """
+        )
+        return [fila_a_dict(fila) for fila in filas]
+    except Exception as error:  # noqa: BLE001
+        logger.exception("Error al listar usuarios: %s", error)
+        raise ApiError(500, "Error interno al consultar los usuarios.") from error
+
+
+@router.put("/{id}/bloqueo")
+async def cambiar_bloqueo_usuario(
+    id: str,
+    datos: BloqueoUsuarioRequest,
+    admin: dict[str, Any] = Depends(administrador_requerido),
+    conexion: asyncpg.Connection = Depends(obtener_conexion),
+) -> dict[str, Any]:
+    # permite al administrador bloquear o desbloquear una cuenta de usuario
+    id_usuario = parsear_entero(id)
+    if id_usuario is None:
+        raise ApiError(400, "Identificador de usuario inválido.")
+
+    if id_usuario == admin.get("id"):
+        raise ApiError(400, "No puedes bloquear tu propia cuenta de administrador.")
+
+    try:
+        objetivo = await conexion.fetchrow(
+            "SELECT id_usuario, nombre, email, rol FROM usuarios WHERE id_usuario = $1",
+            id_usuario,
+        )
+        if objetivo is None:
+            raise ApiError(404, "Usuario no encontrado.")
+
+        if es_administrador(dict(objetivo)):
+            raise ApiError(403, "No está permitido bloquear a otro administrador.")
+
+        motivo_limpio = (datos.motivo or "").strip() or None
+        if datos.bloqueado and not motivo_limpio:
+            motivo_limpio = "Actividad sospechosa o incumplimiento de normas."
+
+        fila = await conexion.fetchrow(
+            """
+            UPDATE usuarios
+            SET bloqueado = $1,
+                motivo_bloqueo = $2,
+                fecha_bloqueo = CASE WHEN $1 THEN NOW() ELSE NULL END
+            WHERE id_usuario = $3
+            RETURNING id_usuario, nombre, email, telefono, direccion, rol,
+                      fecha_registro, bloqueado, motivo_bloqueo, fecha_bloqueo
+            """,
+            datos.bloqueado,
+            motivo_limpio if datos.bloqueado else None,
+            id_usuario,
+        )
+
+        accion = "bloqueado" if datos.bloqueado else "desbloqueado"
+        return {
+            "mensaje": f"Usuario {accion} correctamente.",
+            "usuario": fila_a_dict(fila),
+        }
+    except ApiError:
+        raise
+    except Exception as error:  # noqa: BLE001
+        logger.exception("Error al actualizar estado de bloqueo: %s", error)
+        raise ApiError(500, "Error interno al actualizar el bloqueo del usuario.") from error
 
 
 @router.delete("/{id}")

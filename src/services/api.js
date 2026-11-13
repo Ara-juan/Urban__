@@ -63,12 +63,12 @@ export async function eliminarProducto(id) {
 
 //usuarios:
 
-export async function registrarUsuario({ nombre, email, contrasena, telefono, direccion }) {
+export async function registrarUsuario({ nombre, email, contrasena, telefono, direccion, acepto_politica }) {
   return manejarRespuesta(
     await fetch(`${API_BASE}/usuarios/registro`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, email, contrasena, telefono, direccion })
+      body: JSON.stringify({ nombre, email, contrasena, telefono, direccion, acepto_politica })
     })
   );
 }
@@ -146,6 +146,26 @@ export async function eliminarCuenta() {
     await fetch(`${API_BASE}/usuarios/${id}`, {
       method: 'DELETE',
       headers: { ...authHeaders() }
+    })
+  );
+}
+
+// administración de usuarios (solo rol administrador):
+
+export async function obtenerUsuarios() {
+  return manejarRespuesta(
+    await fetch(`${API_BASE}/usuarios`, {
+      headers: { ...authHeaders() }
+    })
+  );
+}
+
+export async function cambiarBloqueoUsuario(id, { bloqueado, motivo = null }) {
+  return manejarRespuesta(
+    await fetch(`${API_BASE}/usuarios/${id}/bloqueo`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ bloqueado, motivo })
     })
   );
 }

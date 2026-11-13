@@ -1,8 +1,45 @@
-/* panel de administracion de productos */
+/* panel de administracion de productos y usuarios */
 .admin-main {
-  max-width: 1000px;
+  max-width: 1050px;
   padding-top: 110px; /* desplaza el contenido hacia abajo para que la navbar no tape el título */
   margin-bottom: 40px;
+}
+
+/* barra superior de pestañas entre Productos y Usuarios */
+.admin-tabs {
+  display: flex;
+  gap: 10px;
+  background: rgba(15, 15, 15, 0.85);
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #a0a0a0;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-tab-btn.activa {
+  background: var(--bs-primary, #4da3ff);
+  color: #111111;
+  box-shadow: 0 4px 14px rgba(77, 163, 255, 0.3);
 }
 
 /* tarjeta oscura principal con bordes redondeados y fondo borroso */
@@ -55,11 +92,17 @@
   color: white;
 }
 
+.admin-main .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
 /* brillo sutil de enfoque alineado a la nueva paleta al dar clic sobre un campo */
 .admin-main .form-control:focus {
   border-color: var(--bs-primary, #4da3ff);
   box-shadow: 0 0 8px rgba(77, 163, 255, 0.5);
   outline: none;
+  background-color: rgba(25, 25, 25, 0.95);
+  color: white;
 }
 
 /* asegura que los desplegables mantengan el fondo oscuro al abrirse */
@@ -93,8 +136,128 @@
   cursor: wait;
 }
 
-/* limita el alto de la tabla de productos y le pone barra de desplazamiento */
+/* limita el alto de las tablas y les pone barra de desplazamiento */
 .admin-main .table-responsive {
-  max-height: 500px;
+  max-height: 520px;
   overflow-y: auto;
+}
+
+/* tarjetas de métricas en la pestaña de usuarios */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.admin-stat-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-stat-card.activo {
+  border-left: 3px solid #00ffcc;
+}
+
+.admin-stat-card.bloqueado {
+  border-left: 3px solid #dc3545;
+}
+
+.stat-numero {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.stat-etiqueta {
+  font-size: 12px;
+  color: #a0a0a0;
+  margin-top: 2px;
+}
+
+/* resalte visual de filas bloqueadas y motivo */
+.fila-usuario-bloqueado td {
+  background-color: rgba(220, 53, 69, 0.08) !important;
+}
+
+.motivo-texto-tabla {
+  font-size: 11.5px;
+  color: #ffb3b9;
+  margin-top: 4px;
+  max-width: 210px;
+  line-height: 1.3;
+}
+
+/* modal para seleccionar el motivo de bloqueo */
+.modal-bloqueo-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-bloqueo-caja {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(18, 18, 18, 0.97);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 26px;
+  color: #ffffff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.modal-bloqueo-caja h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff6b7a;
+}
+
+.motivos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.motivo-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #d6d6d6;
+  border-radius: 6px;
+  padding: 7px 11px;
+  font-size: 12.5px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.motivo-chip:hover {
+  border-color: #00ffcc;
+  color: #ffffff;
+}
+
+.motivo-chip.activo {
+  background: rgba(220, 53, 69, 0.22);
+  border-color: #dc3545;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .admin-tabs {
+    flex-direction: column;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
 }

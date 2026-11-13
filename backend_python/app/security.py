@@ -5,11 +5,13 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import asyncpg
 import bcrypt
 import jwt
 from fastapi import Depends, Header
 
 from app.config import settings
+from app.database import obtener_conexion
 
 # aca definimos como vamos a encriptar todo y cuanto tiempo duran los permisos para cada cosa
 ALGORITHM = "HS256"
@@ -67,7 +69,10 @@ def es_administrador(usuario: dict[str, Any]) -> bool:
     return usuario.get("rol") in ROLES_ADMINISTRADOR
 
 
-async def usuario_autenticado(authorization: str | None = Header(default=None)) -> dict[str, Any]:
+async def usuario_autenticado(
+    authorization: str | None = Header(default=None),
+    conexion: asyncpg.Connection = Depends(obtener_conexion),
+) -> dict[str, Any]:
     # esto es igualito a verificar token en express si no hay token mandamos error 401 y si no sirve mandamos 403
     partes = authorization.split(" ") if authorization else []
     token = partes[1] if len(partes) > 1 else None
@@ -77,10 +82,28 @@ async def usuario_autenticado(authorization: str | None = Header(default=None)) 
         raise ApiError(401, "Acceso denegado. No se proporcionó un token.")
 
     try:
-        # si el token es bueno devolvemos los datos de la persona
-        return decodificar_token(token)
+        # si el token es bueno sacamos los datos de la persona
+        payload = decodificar_token(token)
     except jwt.InvalidTokenError as error:
         raise ApiError(403, "Token inválido o expirado.") from error
+
+    # verificamos en tiempo real que la cuenta siga activa y no haya sido bloqueada por un admin
+    fila = await conexion.fetchrow(
+        "SELECT rol, bloqueado, motivo_bloqueo FROM usuarios WHERE id_usuario = $1",
+        payload.get("id"),
+    )
+    if fila is None:
+        raise ApiError(401, "La cuenta asociada a esta sesión ya no existe.")
+
+    if fila["bloqueado"]:
+        motivo = f" Motivo: {fila['motivo_bloqueo']}" if fila["motivo_bloqueo"] else ""
+        raise ApiError(
+            403,
+            f"Tu cuenta ha sido bloqueada por un administrador.{motivo}",
+        )
+
+    payload["rol"] = fila["rol"]
+    return payload
 
 
 async def administrador_requerido(
