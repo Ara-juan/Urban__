@@ -49,8 +49,12 @@ export default function Login() {
 
     const yaAceptoAntes = localStorage.getItem('americanoshh_privacidad_aceptada') === 'true';
     if (!yaAceptoAntes && !aceptoPolitica) {
-      window.dispatchEvent(new Event('abrir-politica-privacidad'));
+      window.dispatchEvent(new CustomEvent('abrir-centro-legal', { detail: 'privacidad' }));
     }
+  };
+
+  const abrirModalLegal = (seccion) => {
+    window.dispatchEvent(new CustomEvent('abrir-centro-legal', { detail: seccion }));
   };
 
   const manejarLogin = async (event) => {
@@ -81,9 +85,8 @@ export default function Login() {
     event.preventDefault();
     setMensaje(null);
 
-    // doble barrera de seguridad en frontend
     if (!aceptoPolitica) {
-      mostrarMensaje('Debes aceptar la política de tratamiento de datos para registrarte.', true);
+      mostrarMensaje('Debes aceptar la política de tratamiento de datos y los términos para registrarte.', true);
       return;
     }
 
@@ -238,13 +241,21 @@ export default function Login() {
                 required
               />
               <span>
-                Acepto de forma obligatoria el tratamiento de mis datos personales según la{' '}
+                Declaro ser mayor de edad (o contar con autorización legal) y acepto de forma obligatoria la{' '}
                 <button
                   type="button"
                   className="enlace-politica-inline"
-                  onClick={() => window.dispatchEvent(new Event('abrir-politica-privacidad'))}
+                  onClick={() => abrirModalLegal('privacidad')}
                 >
-                  Política de Privacidad
+                  Política de Datos
+                </button>{' '}
+                y los{' '}
+                <button
+                  type="button"
+                  className="enlace-politica-inline"
+                  onClick={() => abrirModalLegal('terminos')}
+                >
+                  Términos y Garantías
                 </button>
                 .
               </span>
@@ -260,7 +271,7 @@ export default function Login() {
               type="submit"
               className="btn"
               disabled={cargando || !aceptoPolitica}
-              title={!aceptoPolitica ? 'Acepta la política de datos para continuar' : ''}
+              title={!aceptoPolitica ? 'Acepta la política de datos y términos para continuar' : ''}
             >
               {cargando ? 'registrando...' : 'Registrarse'}
             </button>

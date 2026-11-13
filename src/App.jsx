@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
+import FooterLegal from './components/FooterLegal.jsx';
 import AvisoPrivacidad from './components/AvisoPrivacidad.jsx';
 import Inicio from './pages/Inicio.jsx';
 import Colecciones from './pages/Colecciones.jsx';
@@ -13,7 +14,7 @@ import AdminProductos from './pages/AdminProductos.jsx';
 export default function App() {
   const location = useLocation();
 
-  // listamos las rutas donde preferimos ocultar la barra de navegación superior
+  // listamos las rutas donde preferimos ocultar la barra de navegación superior y el footer
   const rutasSinNavbar = ['/', '/login'];
 
   return (
@@ -37,6 +38,9 @@ export default function App() {
         {/* si el usuario se inventa una url o escribe mal, lo devolvemos al inicio */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {/* pie de página legal permanente con políticas, PQR y enlace obligatorio a la SIC */}
+      {!rutasSinNavbar.includes(location.pathname) && <FooterLegal />}
 
       {/* anuncio legal de tratamiento de datos visible al ingresar */}
       <AvisoPrivacidad />
