@@ -86,7 +86,10 @@ export default function Login() {
     setMensaje(null);
 
     if (!aceptoPolitica) {
-      mostrarMensaje('Debes aceptar la política de tratamiento de datos y los términos para registrarte.', true);
+      mostrarMensaje(
+        'Debes otorgar tu autorización previa, expresa e informada (Ley 1581 de 2012) y aceptar los términos (Ley 1480 de 2011) para registrarte.',
+        true
+      );
       return;
     }
 
@@ -241,21 +244,29 @@ export default function Login() {
                 required
               />
               <span>
-                Declaro ser mayor de edad (o contar con autorización legal) y acepto de forma obligatoria la{' '}
+                Declaro ser mayor de edad (o contar con autorización de representante legal, Art. 7 Ley 1581 de 2012) y otorgo autorización previa, expresa e informada para el tratamiento de mis datos bajo la{' '}
                 <button
                   type="button"
                   className="enlace-politica-inline"
                   onClick={() => abrirModalLegal('privacidad')}
                 >
-                  Política de Datos
-                </button>{' '}
-                y los{' '}
+                  Política de Datos (Art. 15 C.P., Ley 1581 de 2012 y Dec. 1377 de 2013)
+                </button>
+                , aceptando además los{' '}
                 <button
                   type="button"
                   className="enlace-politica-inline"
                   onClick={() => abrirModalLegal('terminos')}
                 >
-                  Términos y Garantías
+                  Términos, Producción bajo Demanda, Retracto y Garantías (Ley 1480 de 2011 y Ley 527 de 1999)
+                </button>{' '}
+                y las normas de{' '}
+                <button
+                  type="button"
+                  className="enlace-politica-inline"
+                  onClick={() => abrirModalLegal('propiedad')}
+                >
+                  Propiedad Intelectual y Uso Aceptable (Ley 23 de 1982 y Ley 1273 de 2009)
                 </button>
                 .
               </span>
@@ -263,7 +274,7 @@ export default function Login() {
 
             {!aceptoPolitica && (
               <p className="aviso-obligatorio-registro">
-                * Debes marcar la casilla de autorización para habilitar el registro.
+                Debes marcar la casilla de autorización legal (Ley 1581 de 2012 y Ley 1480 de 2011) para habilitar el registro.
               </p>
             )}
 
@@ -271,7 +282,7 @@ export default function Login() {
               type="submit"
               className="btn"
               disabled={cargando || !aceptoPolitica}
-              title={!aceptoPolitica ? 'Acepta la política de datos y términos para continuar' : ''}
+              title={!aceptoPolitica ? 'Acepta la autorización legal bajo Ley 1581 de 2012 y Ley 1480 de 2011 para continuar' : ''}
             >
               {cargando ? 'registrando...' : 'Registrarse'}
             </button>
