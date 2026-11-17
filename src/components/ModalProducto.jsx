@@ -115,7 +115,7 @@ export default function ModalProducto({ producto, onCerrar }) {
 
             {/* aviso explícito sobre producción bajo demanda y tiempos de envío */}
             <div className="aviso-pod-modal" role="note">
-              <strong>Prenda bajo demanda:</strong> No manejamos stock pre-estampado; tu camiseta se produce especialmente al confirmar el pedido, por lo que su despacho y envío puede tardar unos días adicionales.
+              <strong>Prenda bajo demanda (Art. 50, Ley 1480 de 2011):</strong> No manejamos stock pre-estampado; tu camiseta se produce especialmente al confirmar el pedido por WhatsApp, por lo que su despacho y envío tarda días hábiles adicionales.
             </div>
 
             <button type="button" className="btn-buy" aria-label="comprar producto a través de whatsapp">
@@ -128,13 +128,13 @@ export default function ModalProducto({ producto, onCerrar }) {
             <p className="modal-desc">{producto.descripcion || 'sin descripción disponible.'}</p>
 
             <p className="modal-nota-legal">
-              Precio en pesos colombianos (COP). Tiempos de producción bajo demanda y valor de envío se confirman por WhatsApp. Consulta nuestras{' '}
+              Precio en pesos colombianos (COP) conforme a los Arts. 23 y 26 de la Ley 1480 de 2011. El valor de envío y plazo de producción se confirman por WhatsApp (Ley 527 de 1999). Consulta nuestras{' '}
               <button
                 type="button"
                 className="modal-enlace-legal"
                 onClick={() => window.dispatchEvent(new CustomEvent('abrir-centro-legal', { detail: 'terminos' }))}
               >
-                condiciones de producción, garantía y retracto
+                condiciones de producción, retracto (Art. 47) y garantía legal (30 días)
               </button>
               .
             </p>
