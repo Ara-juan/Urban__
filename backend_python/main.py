@@ -6,6 +6,7 @@ import logging
 from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
 
+from asyncpg.exceptions import UniqueViolationError
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,22 +57,30 @@ async def inicializar_administrador() -> None:
             )
             return
 
-        await conexion.execute(
-            """
-            INSERT INTO usuarios (
-                nombre, email, contrasena, rol,
-                acepto_politica, fecha_aceptacion_politica, bloqueado
+        try:
+            await conexion.execute(
+                """
+                INSERT INTO usuarios (
+                    nombre, email, contrasena, rol,
+                    acepto_politica, fecha_aceptacion_politica, bloqueado
+                )
+                VALUES ($1, $2, $3, 'ADMINISTRADOR', TRUE, NOW(), FALSE)
+                """,
+                settings.admin_nombre,
+                settings.admin_email,
+                hashear_contrasena(settings.admin_password),
             )
-            VALUES ($1, $2, $3, 'ADMINISTRADOR', TRUE, NOW(), FALSE)
-            """,
-            settings.admin_nombre,
-            settings.admin_email,
-            hashear_contrasena(settings.admin_password),
-        )
-        logger.info(
-            "Cuenta administradora inicializada en la base de datos: %s",
-            settings.admin_email,
-        )
+            logger.info(
+                "Cuenta administradora inicializada en la base de datos: %s",
+                settings.admin_email,
+            )
+        except UniqueViolationError as error:
+            logger.error(
+                "No se pudo crear el administrador (%s) por restricción única en BD: %s. "
+                "Cambia ADMIN_NOMBRE o revisa registros duplicados en Supabase.",
+                settings.admin_email,
+                error,
+            )
 
 
 @asynccontextmanager
