@@ -49,6 +49,9 @@ class Settings:
     resend_from: str
     frontend_url: str
     entorno: str
+    admin_email: str
+    admin_password: str
+    admin_nombre: str
 
 
 def cargar_settings() -> Settings:
@@ -74,6 +77,10 @@ def cargar_settings() -> Settings:
             os.getenv("FRONTEND_URL") or "https://americanos-hh.netlify.app"
         ).strip().rstrip("/"),
         entorno=os.getenv("ENTORNO", "development"),
+        # credenciales predefinidas de la cuenta administradora
+        admin_email=os.getenv("ADMIN_EMAIL", "juan.aragom.27@gmail.com").strip().lower(),
+        admin_password=os.getenv("ADMIN_PASSWORD", "").strip(),
+        admin_nombre=os.getenv("ADMIN_NOMBRE", "Administrador Americanoshh").strip(),
     )
 
 

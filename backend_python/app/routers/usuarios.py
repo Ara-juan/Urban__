@@ -75,15 +75,19 @@ async def registrar_usuario(
         )
 
     try:
-        # aca metemos al usuario nuevo a la base de datos y le encriptamos la clave
+        # guardamos el usuario con rol CLIENTE y dejamos constancia legal de su aceptación y fecha
         fila = await conexion.fetchrow(
             """
-            INSERT INTO usuarios (nombre, email, contrasena, telefono, direccion)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING id_usuario, nombre, email, rol, fecha_registro
+            INSERT INTO usuarios (
+                nombre, email, contrasena, telefono, direccion,
+                rol, acepto_politica, fecha_aceptacion_politica
+            )
+            VALUES ($1, $2, $3, $4, $5, 'CLIENTE', TRUE, NOW())
+            RETURNING id_usuario, nombre, email, rol, fecha_registro,
+                      acepto_politica, fecha_aceptacion_politica
             """,
-            datos.nombre,
-            datos.email,
+            datos.nombre.strip(),
+            datos.email.strip().lower(),
             hashear_contrasena(datos.contrasena),
             datos.telefono,
             datos.direccion,
@@ -111,11 +115,11 @@ async def iniciar_sesion(
         raise ApiError(400, "Por favor ingresa email y contraseña.")
 
     try:
-        # buscamos al usuario usando su correo
+        # buscamos al usuario usando su correo (sin distinguir mayusculas/minusculas)
         usuario = await conexion.fetchrow(
             """
             SELECT id_usuario, nombre, email, contrasena, rol, bloqueado, motivo_bloqueo
-            FROM usuarios WHERE email = $1
+            FROM usuarios WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))
             """,
             datos.email,
         )
@@ -140,7 +144,7 @@ async def iniciar_sesion(
                 f"Tu cuenta ha sido bloqueada por un administrador.{motivo}",
             )
 
-        # si todo salio bien le armamos un token para que navegue sin estar iniciando sesion a cada rato
+        # si todo salio bien le armamos un token con el rol que tiene en la BD (CLIENTE o ADMINISTRADOR)
         token = crear_token(
             {
                 "id": usuario["id_usuario"],
@@ -179,7 +183,7 @@ async def recuperar_contrasena(
     try:
         # primero miramos si el correo si lo tenemos registrado
         consulta = await conexion.fetchrow(
-            "SELECT id_usuario, nombre, bloqueado FROM usuarios WHERE email = $1",
+            "SELECT id_usuario, nombre, bloqueado FROM usuarios WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))",
             datos.email,
         )
         if consulta is None:
@@ -259,7 +263,8 @@ async def obtener_perfil(
         # sacamos el id del token y con eso buscamos todos sus datos
         fila = await conexion.fetchrow(
             """
-            SELECT id_usuario, nombre, email, telefono, direccion, rol
+            SELECT id_usuario, nombre, email, telefono, direccion, rol,
+                   acepto_politica, fecha_aceptacion_politica
             FROM usuarios WHERE id_usuario = $1
             """,
             usuario.get("id"),
@@ -358,7 +363,8 @@ async def listar_usuarios(
         filas = await conexion.fetch(
             """
             SELECT id_usuario, nombre, email, telefono, direccion, rol,
-                   fecha_registro, bloqueado, motivo_bloqueo, fecha_bloqueo
+                   fecha_registro, acepto_politica, fecha_aceptacion_politica,
+                   bloqueado, motivo_bloqueo, fecha_bloqueo
             FROM usuarios
             ORDER BY id_usuario DESC
             """
@@ -443,14 +449,20 @@ async def eliminar_usuario(
         if id_usuario is None:
             raise ValueError(f"Identificador de usuario inválido: {id}")
 
-        fila = await conexion.fetchrow(
-            "DELETE FROM usuarios WHERE id_usuario = $1 RETURNING id_usuario",
+        objetivo = await conexion.fetchrow(
+            "SELECT rol FROM usuarios WHERE id_usuario = $1",
             id_usuario,
         )
-
-        # si no se devolvio id es porque la cuenta ya no existia
-        if fila is None:
+        if objetivo is None:
             raise ApiError(404, "Usuario no encontrado para eliminar.")
+
+        if es_administrador(dict(objetivo)):
+            raise ApiError(403, "La cuenta de administrador no puede ser eliminada.")
+
+        await conexion.execute(
+            "DELETE FROM usuarios WHERE id_usuario = $1",
+            id_usuario,
+        )
 
         return {"mensaje": "Usuario eliminado correctamente del sistema."}
     except ApiError:

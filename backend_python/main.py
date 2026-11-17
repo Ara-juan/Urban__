@@ -12,9 +12,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.database import cerrar_pool, comprobar_conexion
+from app.database import cerrar_pool, comprobar_conexion, obtener_conexion
 from app.routers import productos, usuarios
-from app.security import ApiError
+from app.security import ApiError, hashear_contrasena
 
 # configuramos el registro de eventos para ver todo lo que pasa en la consola
 logging.basicConfig(
@@ -22,6 +22,56 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
 logger = logging.getLogger("urban")
+
+
+async def inicializar_administrador() -> None:
+    # verifica o crea de antemano la cuenta predefinida con rol ADMINISTRADOR
+    if not settings.admin_email:
+        return
+
+    async for conexion in obtener_conexion():
+        existente = await conexion.fetchrow(
+            "SELECT id_usuario, rol FROM usuarios WHERE LOWER(TRIM(email)) = LOWER($1)",
+            settings.admin_email,
+        )
+
+        if existente is not None:
+            logger.info(
+                "Cuenta administradora verificada (%s | rol=%s).",
+                settings.admin_email,
+                existente["rol"],
+            )
+            return
+
+        if not settings.admin_password:
+            logger.warning(
+                "ADMIN_PASSWORD no está definida en .env; no se creó la cuenta %s automáticamente.",
+                settings.admin_email,
+            )
+            return
+
+        if len(settings.admin_password) < 8:
+            logger.warning(
+                "ADMIN_PASSWORD debe tener al menos 8 caracteres para crear la cuenta administradora."
+            )
+            return
+
+        await conexion.execute(
+            """
+            INSERT INTO usuarios (
+                nombre, email, contrasena, rol,
+                acepto_politica, fecha_aceptacion_politica, bloqueado
+            )
+            VALUES ($1, $2, $3, 'ADMINISTRADOR', TRUE, NOW(), FALSE)
+            """,
+            settings.admin_nombre,
+            settings.admin_email,
+            hashear_contrasena(settings.admin_password),
+        )
+        logger.info(
+            "Cuenta administradora inicializada en la base de datos: %s",
+            settings.admin_email,
+        )
 
 
 @asynccontextmanager
@@ -34,6 +84,8 @@ async def ciclo_de_vida(_app: FastAPI) -> AsyncGenerator[None, None]:
 
     # verificamos que la base de datos responda antes de recibir peticiones
     await comprobar_conexion()
+    # aseguramos que el usuario administrador predefinido exista en la BD
+    await inicializar_administrador()
     yield
     # y cuando el servidor se apague cerramos el pool de conexiones de forma limpia
     await cerrar_pool()
