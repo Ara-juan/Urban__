@@ -1,4 +1,4 @@
-# rutas de usuarios registro sesion recuperacion de contrasena y perfil
+# rutas de usuarios registro sesion recuperacion de contrasena perfil y favoritos
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ from app.security import (
     usuario_autenticado,
     verificar_contrasena,
 )
-from app.serialization import fila_a_dict
+from app.serialization import fila_a_dict, filas_a_lista
 from app.services.correo import construir_enlace_recuperacion, enviar_correo_recuperacion
 from app.utils import parsear_entero
 
@@ -118,7 +118,8 @@ async def iniciar_sesion(
         # buscamos al usuario usando su correo (sin distinguir mayusculas/minusculas)
         usuario = await conexion.fetchrow(
             """
-            SELECT id_usuario, nombre, email, contrasena, rol, bloqueado, motivo_bloqueo
+            SELECT id_usuario, nombre, email, contrasena, telefono, direccion,
+                   rol, bloqueado, motivo_bloqueo
             FROM usuarios WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))
             """,
             datos.email,
@@ -161,6 +162,8 @@ async def iniciar_sesion(
                 "id": usuario["id_usuario"],
                 "nombre": usuario["nombre"],
                 "email": usuario["email"],
+                "telefono": usuario["telefono"],
+                "direccion": usuario["direccion"],
                 "rol": usuario["rol"],
             },
         }
@@ -334,7 +337,7 @@ async def actualizar_perfil(
                 telefono = COALESCE($2, telefono),
                 direccion = COALESCE($3, direccion)
             WHERE id_usuario = $4
-            RETURNING id_usuario, nombre, email, telefono, direccion
+            RETURNING id_usuario, nombre, email, telefono, direccion, rol
             """,
             nuevo_hash,
             datos.telefono,
@@ -351,6 +354,93 @@ async def actualizar_perfil(
     except Exception as error:  # noqa: BLE001
         logger.exception("Error al actualizar el perfil: %s", error)
         raise ApiError(500, "Error interno al actualizar la información.") from error
+
+
+# --- LISTA DE FAVORITOS DEL USUARIO ("GUARDAR PARA QUINCENA") ---
+
+
+@router.get("/favoritos")
+async def obtener_favoritos(
+    usuario: dict[str, Any] = Depends(usuario_autenticado),
+    conexion: asyncpg.Connection = Depends(obtener_conexion),
+) -> list[dict[str, Any]]:
+    # devuelve las prendas activas guardadas en favoritos por el usuario autenticado
+    try:
+        filas = await conexion.fetch(
+            """
+            SELECT p.id_producto, p.titulo, p.descripcion, p.precio,
+                   p.imagen_url, p.categoria, p.tallas, p.estado,
+                   f.fecha_agregado
+            FROM favoritos f
+            INNER JOIN productos p ON p.id_producto = f.id_producto
+            WHERE f.id_usuario = $1 AND p.estado = 'activo'
+            ORDER BY f.fecha_agregado DESC
+            """,
+            usuario.get("id"),
+        )
+        return filas_a_lista(filas)
+    except Exception as error:  # noqa: BLE001
+        logger.exception("Error al consultar favoritos: %s", error)
+        raise ApiError(500, "Error interno al consultar tus favoritos.") from error
+
+
+@router.post("/favoritos/{id_producto}", status_code=201)
+async def agregar_favorito(
+    id_producto: str,
+    usuario: dict[str, Any] = Depends(usuario_autenticado),
+    conexion: asyncpg.Connection = Depends(obtener_conexion),
+) -> dict[str, str]:
+    # guarda una prenda en la lista de favoritos del usuario
+    prod_id = parsear_entero(id_producto)
+    if prod_id is None:
+        raise ApiError(400, "Identificador de producto inválido.")
+
+    try:
+        existe = await conexion.fetchrow(
+            "SELECT id_producto FROM productos WHERE id_producto = $1 AND estado = 'activo'",
+            prod_id,
+        )
+        if existe is None:
+            raise ApiError(404, "La prenda no existe o no está disponible.")
+
+        await conexion.execute(
+            """
+            INSERT INTO favoritos (id_usuario, id_producto)
+            VALUES ($1, $2)
+            ON CONFLICT (id_usuario, id_producto) DO NOTHING
+            """,
+            usuario.get("id"),
+            prod_id,
+        )
+        return {"mensaje": "Prenda guardada en tus favoritos."}
+    except ApiError:
+        raise
+    except Exception as error:  # noqa: BLE001
+        logger.exception("Error al guardar favorito: %s", error)
+        raise ApiError(500, "No se pudo guardar la prenda en favoritos.") from error
+
+
+@router.delete("/favoritos/{id_producto}")
+async def eliminar_favorito(
+    id_producto: str,
+    usuario: dict[str, Any] = Depends(usuario_autenticado),
+    conexion: asyncpg.Connection = Depends(obtener_conexion),
+) -> dict[str, str]:
+    # quita una prenda de la lista de favoritos del usuario
+    prod_id = parsear_entero(id_producto)
+    if prod_id is None:
+        raise ApiError(400, "Identificador de producto inválido.")
+
+    try:
+        await conexion.execute(
+            "DELETE FROM favoritos WHERE id_usuario = $1 AND id_producto = $2",
+            usuario.get("id"),
+            prod_id,
+        )
+        return {"mensaje": "Prenda eliminada de tus favoritos."}
+    except Exception as error:  # noqa: BLE001
+        logger.exception("Error al eliminar favorito: %s", error)
+        raise ApiError(500, "No se pudo quitar la prenda de favoritos.") from error
 
 
 @router.get("")
