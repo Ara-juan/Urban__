@@ -1,0 +1,37 @@
+/* Posicionamiento y botón flotante de favoritos en las tarjetas del catálogo */
+.card {
+  position: relative;
+}
+
+.btn-favorito-card {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(12, 12, 12, 0.78);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-size: 17px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-favorito-card:hover {
+  transform: scale(1.1);
+  border-color: #00ffcc;
+  color: #00ffcc;
+}
+
+.btn-favorito-card.guardado {
+  background: rgba(220, 53, 69, 0.22);
+  border-color: #ff4d6d;
+  color: #ff4d6d;
+}
