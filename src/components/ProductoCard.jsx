@@ -1,7 +1,15 @@
-// Tarjeta de producto
+// Tarjeta de producto con botón de guardar en favoritos
 // Al hacer clic abre el modal con los detalles (via prop onVerDetalle).
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import './ProductoCard.css';
+
 export default function ProductoCard({ producto, onVerDetalle }) {
+  const { sesionActiva, esFavorito, alternarFavorito } = useAuth();
+  const navigate = useNavigate();
+
   const precioFormateado = `$${parseInt(producto.precio, 10).toLocaleString('es-CO')}`;
+  const guardado = esFavorito(producto.id_producto);
 
   // Función añadida para accesibilidad SEO: permite interactuar usando teclado
   const handleKeyDown = (e) => {
@@ -11,8 +19,16 @@ export default function ProductoCard({ producto, onVerDetalle }) {
     }
   };
 
+  const manejarClickFavorito = (e) => {
+    e.stopPropagation();
+    if (!sesionActiva) {
+      navigate('/login?tab=register');
+      return;
+    }
+    alternarFavorito(producto);
+  };
+
   return (
-    // cambiamos el <div> POR <article> y ponemos accesibilidad para el evento click
     <article
       className="card"
       data-desc={producto.descripcion || 'Sin descripción disponible.'}
@@ -22,11 +38,27 @@ export default function ProductoCard({ producto, onVerDetalle }) {
       onKeyDown={handleKeyDown}
       aria-label={`Ver detalles de la prenda: ${producto.titulo}`}
     >
-      {/* añadimos LOADING="LAZY" y un texto ALT mas descriptivo */}
-      <img 
-        src={producto.imagen_url} 
-        alt={`Prenda urbana: ${producto.titulo}`} 
-        loading="lazy" 
+      <button
+        type="button"
+        className={`btn-favorito-card ${guardado ? 'guardado' : ''}`}
+        onClick={manejarClickFavorito}
+        aria-label={guardado ? `Quitar ${producto.titulo} de favoritos` : `Guardar ${producto.titulo} en favoritos`}
+        aria-pressed={guardado}
+        title={
+          sesionActiva
+            ? guardado
+              ? 'Guardado en tus favoritos'
+              : 'Guardar en favoritos'
+            : 'Inicia sesión o regístrate para guardar favoritos'
+        }
+      >
+        {guardado ? '♥' : '♡'}
+      </button>
+
+      <img
+        src={producto.imagen_url}
+        alt={`Prenda urbana: ${producto.titulo}`}
+        loading="lazy"
       />
       <h3>{producto.titulo}</h3>
       <p className="price">{precioFormateado}</p>
