@@ -2,7 +2,7 @@
 .modal {
   display: flex;
   position: fixed;
-  z-index: 1000; /* Asegura q el modal flote por encima del navbar y otros elementos*/
+  z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
@@ -10,21 +10,21 @@
   background-color: rgba(0, 0, 0, 0.85);
   align-items: center;
   justify-content: center;
-  animation: aparecerModal 0.3s ease; /* Trancision de opacidad al abrirse*/
+  animation: aparecerModal 0.3s ease;
 }
 
-/* Animación para un entrada suave mediante desvanecimiento (fade-in)*/
 @keyframes aparecerModal {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-/* Ventana principal del modal con estética oscura e iluminación sutil por sombra */
 .modal-content {
   background: rgba(20, 20, 20, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   width: 90%;
   max-width: 950px;
+  max-height: 90vh;
+  overflow-y: auto;
   padding: 40px;
   border-radius: 4px;
   position: relative;
@@ -32,7 +32,6 @@
   color: white;
 }
 
-/* Botón flotante 'X' en la esquina superior derecha para cerrar la ventana */
 .close-modal {
   position: absolute;
   top: 15px;
@@ -44,27 +43,23 @@
   line-height: 1;
 }
 
-/* cambia a azul cuando le pasas el mouse por encima */
 .close-modal:hover {
   color: var(--bs-primary, #007BFF);
 }
 
-/* distribuye la imagen y la info en dos columnas que se acomodan si no hay espacio */
 .modal-body {
   display: flex;
   gap: 40px;
-  flex-wrap: wrap; /* Permite que las columnas se apilen automáticamente si el espacio es reducido */
+  flex-wrap: wrap;
   padding: 0;
 }
 
-/* le da el mismo tamaño base a las dos columnas */
 .modal-left,
 .modal-right {
   flex: 1;
   min-width: 300px;
 }
 
-/* contenedor claro para que resalte la foto del producto */
 .image-container {
   background: rgba(255, 255, 255, 0.05);
   padding: 10px;
@@ -74,7 +69,6 @@
   align-items: center;
 }
 
-/* ajusta la imagen para que no se deforme ni se salga */
 .image-container img {
   max-width: 100%;
   height: auto;
@@ -82,7 +76,6 @@
   display: block;
 }
 
-/* titulo principal del producto con fuente elegante */
 .urban-title {
   font-family: 'Times New Roman', Times, serif;
   font-size: 32px;
@@ -91,7 +84,6 @@
   letter-spacing: 1px;
 }
 
-/* etiqueta de disponibilidad e impresión bajo demanda */
 .modal-stock {
   display: flex;
   align-items: center;
@@ -119,29 +111,25 @@
   font-size: 13.5px;
 }
 
-/* precio destacado en blanco y letra grande */
 .modal-price {
   font-size: 26px;
   font-weight: bold;
   color: #ffffff;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-/* subtitulo para las secciones internas como las tallas */
 .urban-subtitle {
   font-family: 'Times New Roman', Times, serif;
   font-size: 20px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
-/* fila horizontal para organizar los botones de las tallas */
 .sizes-grid {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-/* cuadritos para seleccionar la talla con fondo transparente */
 .size-btn {
   background: rgba(255, 255, 255, 0.25);
   border: none;
@@ -154,68 +142,153 @@
   transition: background 0.2s ease;
 }
 
-/* resalta en azul al pasar el mouse por la talla */
 .size-btn:hover {
   background: #0040ff;
 }
 
-/* resalta la talla elegida con un borde blanco y fondo azul */
 .size-btn.seleccionada {
   background: #0040ff;
   outline: 2px solid #ffffff66;
 }
 
-/* recuadro informativo sobre tiempos de producción bajo demanda */
 .aviso-pod-modal {
   background: rgba(77, 163, 255, 0.1);
   border-left: 3px solid #00ffcc;
   padding: 10px 14px;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 12.5px;
   line-height: 1.45;
   color: #e0e0e0;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
 }
 
 .aviso-pod-modal strong {
   color: #00ffcc;
 }
 
-/* boton de comprar azul con estilo inclinado */
+/* bloque de miembro verificado y compra express */
+.beneficio-miembro-modal {
+  background: rgba(0, 255, 204, 0.08);
+  border: 1px solid rgba(0, 255, 204, 0.28);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 18px;
+}
+
+.beneficio-miembro-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.badge-prioridad-pod {
+  color: #00ffcc;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.miembro-id-tag {
+  font-size: 11.5px;
+  color: #b5b5b5;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.beneficio-miembro-modal p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #d8d8d8;
+}
+
+.enlace-completar-perfil {
+  color: #00ffcc;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* invitación para visitantes sin cuenta */
+.invitacion-registro-modal {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(0, 255, 204, 0.35);
+  border-radius: 6px;
+  padding: 9px 12px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #d6d6d6;
+}
+
+.invitacion-registro-modal a {
+  color: #00ffcc;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.modal-acciones-compra {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 .btn-buy {
   background: #0040ff;
   border: none;
   color: white;
   padding: 14px 0;
-  width: 80%;
-  font-size: 18px;
+  width: 85%;
+  font-size: 17px;
   font-weight: bold;
   cursor: pointer;
   transform: skewX(-20deg);
   box-shadow: 0 4px 15px rgba(0, 64, 255, 0.4);
   transition: background 0.3s ease;
-  margin-bottom: 25px;
 }
 
-/* azul mas oscuro cuando pasas el cursor */
 .btn-buy:hover {
   background: #0026b3;
 }
 
-/* endereza el texto del boton para que no quede inclinado */
 .btn-buy span {
   display: block;
   transform: skewX(20deg);
 }
 
-/* quita el subrayado y mantiene el color si es un enlace */
 .btn-buy a {
   color: inherit;
   text-decoration: none;
   display: block;
 }
 
-/* texto de la descripcion con buen espacio entre lineas */
+.btn-favorito-modal {
+  width: 85%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-favorito-modal:hover {
+  border-color: #00ffcc;
+  color: #00ffcc;
+}
+
+.btn-favorito-modal.guardado {
+  background: rgba(220, 53, 69, 0.16);
+  border-color: #ff4d6d;
+  color: #ff758f;
+}
+
 .modal-desc {
   font-size: 15px;
   line-height: 1.6;
@@ -223,7 +296,6 @@
   text-align: justify;
 }
 
-/* nota legal discreta bajo la descripción del producto */
 .modal-nota-legal {
   margin-top: 16px;
   padding-top: 12px;
@@ -248,16 +320,13 @@
   color: #33ffdb;
 }
 
-/*versión responsive para moviles y tablets*/
 @media (max-width: 768px) {
-  /* limita el alto del modal y activa scroll si no cabe */
   .modal-content {
     padding: 30px 15px 40px 15px;
-    max-height: 85vh; /* Evita que el modal supere el alto de la pantalla */
-    overflow-y: auto; /* Permite desplazar verticalmente el contenido si no cabe */
+    max-height: 85vh;
+    overflow-y: auto;
   }
 
-  /* Rediseño del botón de cierre como un círculo flotante visible en móviles */
   .close-modal {
     top: 8px;
     right: 14px;
@@ -272,26 +341,23 @@
     justify-content: center;
   }
 
-  /* apila las columnas una sobre otra */
   .modal-body {
     flex-direction: column;
     gap: 20px;
     padding-top: 10px;
   }
 
-  /* ocupa todo el ancho disponible */
   .modal-left,
   .modal-right {
     min-width: 100%;
   }
 
-  /* expande el boton de compra al ancho completo */
-  .btn-buy {
-    width: 100%; 
+  .btn-buy,
+  .btn-favorito-modal {
+    width: 100%;
   }
 }
 
-/* ajustes finales para celulares mas pequeños */
 @media (max-width: 480px) {
   .urban-title {
     font-size: 22px;

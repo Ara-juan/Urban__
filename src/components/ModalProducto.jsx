@@ -1,16 +1,23 @@
 // ventana modal para previsualizar los detalles del producto antes de comprar
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 import './ModalProducto.css';
 
 // Guardamos solo el número de teléfono base en una constante
 const NUMERO_WHATSAPP = '573124363561';
 
 export default function ModalProducto({ producto, onCerrar }) {
+  const { usuario, sesionActiva, esFavorito, alternarFavorito } = useAuth();
+
   // guarda la talla que el usuario clica en el modal
   const [tallaSeleccionada, setTallaSeleccionada] = useState(null);
-  
+
   // asegura un listado de tallas aunque la base de datos falle
-  const tallas = Array.isArray(producto?.tallas) && producto.tallas.length > 0 ? producto.tallas : ['XS', 'S', 'M', 'L', 'XL'];
+  const tallas =
+    Array.isArray(producto?.tallas) && producto.tallas.length > 0
+      ? producto.tallas
+      : ['XS', 'S', 'M', 'L', 'XL'];
 
   // permite cerrar el modal pulsando esc en el teclado
   useEffect(() => {
@@ -22,13 +29,25 @@ export default function ModalProducto({ producto, onCerrar }) {
   }, [onCerrar]);
 
   if (!producto) return null;
-  const precioFormateado = `$${parseInt(producto.precio, 10).toLocaleString('es-CO')}`;
 
-  // Armamos el mensaje dinámico para WhatsApp incluyendo el nombre del producto y la talla si fue seleccionada
+  const precioFormateado = `$${parseInt(producto.precio, 10).toLocaleString('es-CO')}`;
+  const guardado = esFavorito(producto.id_producto);
   const textoTalla = tallaSeleccionada ? ` (Talla: ${tallaSeleccionada})` : '';
-  const mensajePrearmado = `Hola, estoy interesado en el producto ${producto.titulo}${textoTalla} (impresión bajo demanda), quiero tener más información sobre tiempos de entrega y pedido.`;
-  
-  // Codificamos el mensaje para que los espacios y caracteres no rompan el enlace web
+
+  // si el usuario tiene sesión activa, armamos el pedido express con sus datos verificados y prioridad POD
+  const mensajePrearmado =
+    sesionActiva && usuario
+      ? `Hola Americanoshh, soy miembro verificado:\n` +
+        `• ID Cliente: #${usuario.id}\n` +
+        `• Nombre: ${usuario.nombre}\n` +
+        `• Teléfono: ${usuario.telefono || 'Por confirmar'}\n` +
+        `• Dirección de entrega: ${usuario.direccion || 'Por confirmar'}\n\n` +
+        `Quiero pedir con [PRIORIDAD POD]:\n` +
+        `• Prenda: ${producto.titulo}${textoTalla}\n` +
+        `• Precio catálogo: ${precioFormateado} COP\n\n` +
+        `Quedo atento para confirmar disponibilidad y valor de envío.`
+      : `Hola, estoy interesado en el producto ${producto.titulo}${textoTalla} (impresión bajo demanda), quiero tener más información sobre tiempos de entrega y pedido.`;
+
   const urlWhatsappDinamica = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensajePrearmado)}`;
 
   // seo avanzado: construimos la metadata estructurada para los rich snippets de google
@@ -52,11 +71,11 @@ export default function ModalProducto({ producto, onCerrar }) {
   };
 
   return (
-    <div 
-      id="product-modal" 
-      className="modal show" 
-      role="dialog" 
-      aria-modal="true" 
+    <div
+      id="product-modal"
+      className="modal show"
+      role="dialog"
+      aria-modal="true"
       aria-labelledby="modal-titulo"
       onClick={(e) => e.target === e.currentTarget && onCerrar()}
     >
@@ -67,11 +86,11 @@ export default function ModalProducto({ producto, onCerrar }) {
 
       <div className="modal-content">
         {/* el aspa de cerrar ahora es accesible por teclado */}
-        <span 
-          className="close-modal" 
-          onClick={onCerrar} 
-          role="button" 
-          tabIndex="0" 
+        <span
+          className="close-modal"
+          onClick={onCerrar}
+          role="button"
+          tabIndex="0"
           aria-label="cerrar ventana de producto"
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCerrar()}
         >
@@ -86,7 +105,6 @@ export default function ModalProducto({ producto, onCerrar }) {
           </div>
 
           <div className="modal-right">
-            {/* id dinámico para el aria-labelledby del contenedor del modal */}
             <h2 id="modal-titulo" className="urban-title">{producto.titulo}</h2>
 
             <p className="modal-stock" aria-live="polite">
@@ -118,12 +136,56 @@ export default function ModalProducto({ producto, onCerrar }) {
               <strong>Prenda bajo demanda (Art. 50, Ley 1480 de 2011):</strong> No manejamos stock pre-estampado; tu camiseta se produce especialmente al confirmar el pedido por WhatsApp, por lo que su despacho y envío tarda días hábiles adicionales.
             </div>
 
-            <button type="button" className="btn-buy" aria-label="comprar producto a través de whatsapp">
-              <span>
-                {/* Aquí inyectamos la URL dinámica que generamos arriba */}
-                <a href={urlWhatsappDinamica} target="_blank" rel="noopener noreferrer">Compra Ahora</a>
-              </span>
-            </button>
+            {/* bloque de beneficios para usuario autenticado o invitación a registrarse */}
+            {sesionActiva && usuario ? (
+              <div className="beneficio-miembro-modal">
+                <div className="beneficio-miembro-cabecera">
+                  <span className="badge-prioridad-pod">⚡ Prioridad de Producción POD</span>
+                  <span className="miembro-id-tag">Miembro #{usuario.id}</span>
+                </div>
+                <p>
+                  <strong>Compra Express lista:</strong> Enviaremos automáticamente tus datos ({usuario.nombre}
+                  {usuario.telefono ? ` • ${usuario.telefono}` : ''}
+                  {usuario.direccion ? ` • ${usuario.direccion}` : ''}) al chat.{' '}
+                  {(!usuario.telefono || !usuario.direccion) && (
+                    <Link to="/perfil" onClick={onCerrar} className="enlace-completar-perfil">
+                      Completa tu teléfono/dirección en Perfil
+                    </Link>
+                  )}
+                </p>
+              </div>
+            ) : (
+              <div className="invitacion-registro-modal">
+                <span>
+                  ⚡ <strong>¿Quieres prioridad en estampado y pedido express?</strong>{' '}
+                  <Link to="/login?tab=register" onClick={onCerrar}>
+                    Regístrate gratis
+                  </Link>{' '}
+                  para guardar favoritos y enviar tus datos de envío automáticamente.
+                </span>
+              </div>
+            )}
+
+            <div className="modal-acciones-compra">
+              <button type="button" className="btn-buy" aria-label="comprar producto a través de whatsapp">
+                <span>
+                  <a href={urlWhatsappDinamica} target="_blank" rel="noopener noreferrer">
+                    {sesionActiva ? 'Pedido Express WhatsApp' : 'Compra Ahora'}
+                  </a>
+                </span>
+              </button>
+
+              {sesionActiva && (
+                <button
+                  type="button"
+                  className={`btn-favorito-modal ${guardado ? 'guardado' : ''}`}
+                  onClick={() => alternarFavorito(producto)}
+                  aria-pressed={guardado}
+                >
+                  {guardado ? '♥ Guardado en Favoritos' : '♡ Guardar en Favoritos'}
+                </button>
+              )}
+            </div>
 
             <p className="modal-desc">{producto.descripcion || 'sin descripción disponible.'}</p>
 
