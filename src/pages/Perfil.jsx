@@ -1,4 +1,4 @@
-// Página Perfil
+// Página Perfil con insignia de Prioridad POD, datos de envío express y Lista de Favoritos
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { obtenerPerfil, actualizarPerfil, eliminarCuenta, cerrarSesion } from '../services/api.js';
@@ -6,14 +6,16 @@ import { useAuth } from '../context/AuthContext.jsx';
 import AlertaMensaje from '../components/AlertaMensaje.jsx';
 import './Perfil.css';
 
+const NUMERO_WHATSAPP = '573124363561';
+
 export default function Perfil() {
-  const [perfil, setPerfil] = useState({ nombre: '', email: '', telefono: '', direccion: '' });
+  const [perfil, setPerfil] = useState({ id: null, nombre: '', email: '', telefono: '', direccion: '', rol: 'CLIENTE' });
   const [contrasenaActual, setContrasenaActual] = useState('');
   const [nuevaContrasena, setNuevaContrasena] = useState('');
   const [mensaje, setMensaje] = useState(null);
   const [mensajeError, setMensajeError] = useState(false);
 
-  const { cerrarSesionLocal } = useAuth();
+  const { usuario, iniciarSesionLocal, cerrarSesionLocal, favoritos, alternarFavorito } = useAuth();
   const navigate = useNavigate();
 
   const mostrarMensaje = (texto, esError = false) => {
@@ -37,16 +39,20 @@ export default function Perfil() {
     }
 
     obtenerPerfil()
-      .then((usuario) => {
-        setPerfil({
-          nombre: usuario.nombre || '',
-          email: usuario.email || '',
-          telefono: usuario.telefono || '',
-          direccion: usuario.direccion || ''
-        });
+      .then((datosUsuario) => {
+        const actualizado = {
+          id: datosUsuario.id_usuario || usuario?.id || null,
+          nombre: datosUsuario.nombre || '',
+          email: datosUsuario.email || '',
+          telefono: datosUsuario.telefono || '',
+          direccion: datosUsuario.direccion || '',
+          rol: datosUsuario.rol || usuario?.rol || 'CLIENTE'
+        };
+        setPerfil(actualizado);
+        iniciarSesionLocal(actualizado);
       })
       .catch((error) => {
-        if (error.message.includes('Token') || error.message.includes('denegado')) {
+        if (error.message.includes('Token') || error.message.includes('denegado') || error.message.includes('bloqueada')) {
           manejarSesionExpirada();
         } else {
           mostrarMensaje('No se pudieron cargar los datos del perfil.', true);
@@ -73,6 +79,17 @@ export default function Perfil() {
         direccion: perfil.direccion || null
       });
 
+      if (resultado.usuario) {
+        iniciarSesionLocal({
+          id: resultado.usuario.id_usuario || perfil.id,
+          nombre: resultado.usuario.nombre || perfil.nombre,
+          email: resultado.usuario.email || perfil.email,
+          telefono: resultado.usuario.telefono || '',
+          direccion: resultado.usuario.direccion || '',
+          rol: resultado.usuario.rol || perfil.rol
+        });
+      }
+
       mostrarMensaje(resultado.mensaje, false);
       setContrasenaActual('');
       setNuevaContrasena('');
@@ -95,11 +112,30 @@ export default function Perfil() {
     }
   };
 
+  const construirUrlPedidoFavorito = (prod) => {
+    const precioFormateado = `$${parseInt(prod.precio, 10).toLocaleString('es-CO')}`;
+    const texto =
+      `Hola Americanoshh, soy miembro verificado:\n` +
+      `• ID Cliente: #${perfil.id || usuario?.id || ''}\n` +
+      `• Nombre: ${perfil.nombre}\n` +
+      `• Teléfono: ${perfil.telefono || 'Por confirmar'}\n` +
+      `• Dirección de entrega: ${perfil.direccion || 'Por confirmar'}\n\n` +
+      `Quiero pedir desde mis Favoritos con [PRIORIDAD POD]:\n` +
+      `• Prenda: ${prod.titulo}\n` +
+      `• Precio catálogo: ${precioFormateado} COP\n\n` +
+      `Quedo atento para confirmar talla, disponibilidad y envío.`;
+    return `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`;
+  };
+
   return (
     <main className="profile-wrapper">
       <div className="profile-card">
+        <div className="perfil-insignia-pod">
+          <span>⚡ Miembro Verificado {perfil.id ? `#${perfil.id}` : ''} • Prioridad de Producción POD</span>
+        </div>
+
         <h2 className="text-center">Mi Perfil</h2>
-        <p className="text-center subtitle">Gestiona tu información personal y de seguridad</p>
+        <p className="text-center subtitle">Gestiona tus datos de envío express, seguridad y prendas favoritas</p>
 
         <form onSubmit={manejarActualizacion}>
           {/* Información básica */}
@@ -115,8 +151,11 @@ export default function Perfil() {
 
           <hr className="profile-divider" />
 
-          {/* Datos Opcionales */}
-          <h3 className="section-title text-start">Datos de Envío (Opcionales)</h3>
+          {/* Datos Opcionales para Compra Express */}
+          <h3 className="section-title text-start">Datos de Envío Express (WhatsApp)</h3>
+          <p className="texto-ayuda-express text-start">
+            Al guardar tu teléfono y dirección, se incluirán automáticamente cuando pidas una prenda por WhatsApp.
+          </p>
 
           <div className="mb-3 text-start">
             <label htmlFor="perfilTelefono" className="form-label">Teléfono</label>
@@ -124,7 +163,7 @@ export default function Perfil() {
               type="tel"
               id="perfilTelefono"
               className="form-control"
-              placeholder="Ingresa tu teléfono (Opcional)"
+              placeholder="Ingresa tu teléfono (solo números)"
               pattern="^[0-9]*$"
               value={perfil.telefono}
               onChange={(e) => setPerfil({ ...perfil, telefono: e.target.value })}
@@ -132,12 +171,12 @@ export default function Perfil() {
           </div>
 
           <div className="mb-3 text-start">
-            <label htmlFor="perfilDireccion" className="form-label">Dirección</label>
+            <label htmlFor="perfilDireccion" className="form-label">Dirección de entrega</label>
             <input
               type="text"
               id="perfilDireccion"
               className="form-control"
-              placeholder="Ingresa tu dirección (Opcional)"
+              placeholder="Ej: Barrio, calle, ciudad..."
               value={perfil.direccion}
               onChange={(e) => setPerfil({ ...perfil, direccion: e.target.value })}
             />
@@ -177,12 +216,62 @@ export default function Perfil() {
           <button type="submit" className="btn-save mt-3">Guardar Cambios</button>
         </form>
 
-        <button type="button" className="btn-eliminar mt-3" onClick={manejarEliminarCuenta}>
-          Eliminar mi cuenta
-        </button>
-
         {/* Mensajes dinámicos */}
         <AlertaMensaje mensaje={mensaje} esError={mensajeError} />
+
+        <hr className="profile-divider" />
+
+        {/* Sección de Lista de Favoritos ("Guardar para quincena") */}
+        <section className="favoritos-perfil-seccion" aria-label="mis prendas favoritas">
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <h3 className="section-title mb-0">Mis Favoritos ({favoritos.length})</h3>
+            <span className="small text-white-50">Guardados para tu próxima compra</span>
+          </div>
+
+          {favoritos.length === 0 ? (
+            <p className="favoritos-vacio">
+              Aún no tienes prendas guardadas. Pulsa el ícono <strong>♡</strong> en cualquier diseño del catálogo para guardarlo aquí.
+            </p>
+          ) : (
+            <div className="favoritos-lista-perfil">
+              {favoritos.map((prod) => (
+                <div key={prod.id_producto} className="favorito-item-card">
+                  <img src={prod.imagen_url} alt={prod.titulo} className="favorito-item-img" />
+                  <div className="favorito-item-info">
+                    <div className="favorito-item-titulo">{prod.titulo}</div>
+                    <div className="favorito-item-precio">
+                      ${parseInt(prod.precio, 10).toLocaleString('es-CO')} COP
+                    </div>
+                  </div>
+                  <div className="favorito-item-acciones">
+                    <a
+                      href={construirUrlPedidoFavorito(prod)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-pedir-favorito"
+                    >
+                      Pedir Express
+                    </a>
+                    <button
+                      type="button"
+                      className="btn-quitar-favorito"
+                      onClick={() => alternarFavorito(prod)}
+                      title="Quitar de favoritos"
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <hr className="profile-divider" />
+
+        <button type="button" className="btn-eliminar mt-2" onClick={manejarEliminarCuenta}>
+          Eliminar mi cuenta
+        </button>
       </div>
     </main>
   );

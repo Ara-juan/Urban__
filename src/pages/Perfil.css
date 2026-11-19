@@ -1,6 +1,6 @@
 /* contenedor del perfil centrado con espacio arriba para no tapar la barra */
 .profile-wrapper {
-  max-width: 520px;
+  max-width: 640px;
   margin: 0 auto 50px auto;
   padding: 110px 15px 0 15px;
   position: relative;
@@ -17,6 +17,24 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* insignia superior de prioridad POD */
+.perfil-insignia-pod {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.perfil-insignia-pod span {
+  display: inline-block;
+  background: rgba(0, 255, 204, 0.12);
+  border: 1px solid rgba(0, 255, 204, 0.35);
+  color: #00ffcc;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
 }
 
 /* titulo principal del perfil en letra blanca grande y resaltada */
@@ -40,11 +58,18 @@
   color: #00ffcc;
   font-size: 14px;
   font-weight: 700;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   margin-top: 10px;
   text-transform: uppercase;
   letter-spacing: 1px;
   text-shadow: 0 0 8px rgba(0, 255, 204, 0.3);
+}
+
+.texto-ayuda-express {
+  font-size: 12.5px;
+  color: #a8a8a8;
+  margin-bottom: 14px;
+  line-height: 1.4;
 }
 
 /* texto de las etiquetas sobre cada campo */
@@ -71,7 +96,6 @@
   outline: none;
 }
 
-/* resalta el campo con borde azul y un salto sutil al hacer clic */
 .profile-card input.form-control:focus:not([readonly]) {
   background: rgba(255, 255, 255, 0.1);
   border-color: var(--bs-primary, #4da3ff);
@@ -79,7 +103,6 @@
   transform: translateY(-2px);
 }
 
-/* estilo con fondo mas oscuro para los campos que no se pueden editar */
 .profile-card input.form-control[readonly] {
   background-color: rgba(0, 0, 0, 0.4);
   border-color: transparent;
@@ -95,7 +118,7 @@
   background: var(--bs-primary, #4da3ff);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  color: #ffffff;
+  color: #111111;
   font-size: 16px;
   font-weight: bold;
   letter-spacing: 1px;
@@ -107,7 +130,6 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* destello de luz transparente que cruza el boton */
 .btn-save::after {
   content: '';
   position: absolute;
@@ -120,23 +142,114 @@
   transition: all 0.6s ease;
 }
 
-/* eleva el boton y le da mas brillo azul al pasar el raton */
 .btn-save:hover {
   background-color: #338cf0;
   transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(77, 163, 255, 0.35);
 }
 
-/* pasa el destello de luz de izquierda a derecha */
 .btn-save:hover::after {
   left: 150%;
   transition: all 0.6s ease;
 }
 
-/* efecto de presion al hacer clic sobre el boton */
 .btn-save:active {
   transform: translateY(1px);
   box-shadow: 0 4px 10px rgba(77, 163, 255, 0.2);
+}
+
+/* sección de favoritos en perfil */
+.favoritos-vacio {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 13px;
+  color: #b5b5b5;
+  text-align: center;
+}
+
+.favoritos-lista-perfil {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.favorito-item-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.favorito-item-img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.favorito-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.favorito-item-titulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.favorito-item-precio {
+  font-size: 13px;
+  color: #00ffcc;
+  font-weight: 600;
+}
+
+.favorito-item-acciones {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-pedir-favorito {
+  background: #0040ff;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 10px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.btn-pedir-favorito:hover {
+  background: #0026b3;
+  color: #ffffff;
+}
+
+.btn-quitar-favorito {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #cccccc;
+  font-size: 12px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-quitar-favorito:hover {
+  border-color: #ff4b4b;
+  color: #ff4b4b;
 }
 
 /* boton transparente con borde rojo para la opcion de eliminar */
@@ -155,7 +268,6 @@
   transition: all 0.3s ease;
 }
 
-/* fondo y brillo rojo suave al pasar el cursor encima */
 .btn-eliminar:hover {
   background: rgba(255, 75, 75, 0.15);
   border-color: #ff4b4b;
@@ -163,12 +275,10 @@
   box-shadow: 0 0 15px rgba(255, 75, 75, 0.3);
 }
 
-/* pequeño encogimiento al presionar el boton de eliminar */
 .btn-eliminar:active {
   transform: scale(0.98);
 }
 
-/* linea divisoria transparente en las puntas para separar secciones */
 hr.profile-divider {
   border: none;
   height: 1px;
@@ -176,7 +286,6 @@ hr.profile-divider {
   margin: 25px 0;
 }
 
-/* adaptacion para celulares ajustando espacios y textos mas pequeños */
 @media (max-width: 768px) {
   .profile-wrapper {
     margin-bottom: 40px;
@@ -191,11 +300,15 @@ hr.profile-divider {
   .section-title {
     font-size: 13px;
   }
+  .favorito-item-card {
+    flex-wrap: wrap;
+  }
+  .favorito-item-acciones {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
-/* animaciones */
-
-/* sube el elemento suavemente mientras va apareciendo */
 @keyframes fadeInUp {
   0% {
     opacity: 0;
