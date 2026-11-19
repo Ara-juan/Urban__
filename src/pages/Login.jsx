@@ -1,4 +1,4 @@
-// página de login, registro y recuperación
+// página de login, registro y recuperación con beneficios visibles para nuevos miembros
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -14,8 +14,11 @@ import './Login.css';
 export default function Login() {
   const [searchParams] = useSearchParams();
   const resetToken = searchParams.get('resetToken');
+  const tabParam = searchParams.get('tab');
 
-  const [pestañaActiva, setPestañaActiva] = useState(resetToken ? 'reset' : 'login');
+  const [pestañaActiva, setPestañaActiva] = useState(
+    resetToken ? 'reset' : tabParam === 'register' ? 'register' : 'login'
+  );
   const [mensaje, setMensaje] = useState(null);
   const [mensajeError, setMensajeError] = useState(false);
   const [cargando, setCargando] = useState(false);
@@ -27,8 +30,10 @@ export default function Login() {
   useEffect(() => {
     if (resetToken) {
       setPestañaActiva('reset');
+    } else if (tabParam === 'register') {
+      setPestañaActiva('register');
     }
-  }, [resetToken]);
+  }, [resetToken, tabParam]);
 
   // si el usuario acepta desde el modal legal, marcamos automáticamente la casilla del registro
   useEffect(() => {
@@ -210,7 +215,7 @@ export default function Login() {
                 onKeyDown={(e) => e.key === 'Enter' && abrirPestañaRegistro()}
                 onClick={abrirPestañaRegistro}
               >
-                Regístrate aquí
+                Regístrate y obtén beneficios
               </span>
             </p>
             <p className="link">
@@ -229,11 +234,22 @@ export default function Login() {
         {pestañaActiva === 'register' && (
           <form className="form active" onSubmit={manejarRegistro} aria-label="formulario de registro">
             <h1>Crear cuenta</h1>
+
+            {/* Tarjeta de incentivos visibles para motivar el registro */}
+            <div className="beneficios-registro-box">
+              <strong>Ventajas exclusivas para miembros:</strong>
+              <ul>
+                <li>⚡ <strong>Prioridad en Producción (POD):</strong> Turno preferencial de estampado y despacho.</li>
+                <li>🚀 <strong>Compra Express WhatsApp:</strong> Tus datos de envío se cargan solos al pedir.</li>
+                <li>♥ <strong>Lista de Favoritos:</strong> Guarda tus prendas para pedirlas en quincena.</li>
+              </ul>
+            </div>
+
             <input type="text" name="nombre" aria-label="nombre completo" placeholder="Nombre completo" required />
             <input type="email" name="email" aria-label="correo electrónico" placeholder="Email" required />
             <input type="password" name="contrasena" aria-label="crear contraseña" placeholder="Contraseña (Mín. 8 caracteres)" minLength={8} required />
-            <input type="tel" name="telefono" aria-label="teléfono opcional" placeholder="Teléfono (opcional, solo números)" pattern="^[0-9]*$" />
-            <input type="text" name="direccion" aria-label="dirección opcional" placeholder="Dirección (opcional)" />
+            <input type="tel" name="telefono" aria-label="teléfono para envío express" placeholder="Teléfono WhatsApp (recomendado, solo números)" pattern="^[0-9]*$" />
+            <input type="text" name="direccion" aria-label="dirección de entrega" placeholder="Dirección de entrega (recomendada)" />
 
             <label className="privacidad-check">
               <input
@@ -284,7 +300,7 @@ export default function Login() {
               disabled={cargando || !aceptoPolitica}
               title={!aceptoPolitica ? 'Acepta la autorización legal bajo Ley 1581 de 2012 y Ley 1480 de 2011 para continuar' : ''}
             >
-              {cargando ? 'registrando...' : 'Registrarse'}
+              {cargando ? 'registrando...' : 'Crear cuenta y activar beneficios'}
             </button>
 
             <p
