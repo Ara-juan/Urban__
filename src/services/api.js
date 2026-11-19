@@ -1,9 +1,5 @@
 // Centraliza todas las llamadas al backend FastAPI (Python + PostgreSQL/Supabase)
 
-// En desarrollo usa la ruta relativa `/api`, que el proxy de vite.config.js envía a
-// localhost:3000. En Netlify, netlify.toml redirige `/api/*` al backend de Render.
-// Para apuntar a otro backend sin tocar código, define VITE_API_URL en el build
-// (por ejemplo https://mi-servicio.onrender.com/api).
 const API_CONFIGURADA = import.meta.env.VITE_API_URL?.trim();
 const API_BASE = (API_CONFIGURADA || '/api').replace(/\/+$/, '');
 
@@ -87,7 +83,6 @@ export async function iniciarSesion({ email, contrasena }) {
   return data;
 }
 
-// Solicita el correo con el enlace de recuperación
 export async function solicitarRecuperacionContrasena(email) {
   return manejarRespuesta(
     await fetch(`${API_BASE}/usuarios/recuperar-contrasena`, {
@@ -98,7 +93,6 @@ export async function solicitarRecuperacionContrasena(email) {
   );
 }
 
-// Envía la nueva contraseña junto con el token enviado por correo
 export async function restablecerContrasena({ token, nuevaContrasena }) {
   return manejarRespuesta(
     await fetch(`${API_BASE}/usuarios/restablecer-contrasena`, {
@@ -144,6 +138,34 @@ export async function eliminarCuenta() {
 
   return manejarRespuesta(
     await fetch(`${API_BASE}/usuarios/${id}`, {
+      method: 'DELETE',
+      headers: { ...authHeaders() }
+    })
+  );
+}
+
+// favoritos del usuario:
+
+export async function obtenerFavoritos() {
+  return manejarRespuesta(
+    await fetch(`${API_BASE}/usuarios/favoritos`, {
+      headers: { ...authHeaders() }
+    })
+  );
+}
+
+export async function agregarFavorito(idProducto) {
+  return manejarRespuesta(
+    await fetch(`${API_BASE}/usuarios/favoritos/${idProducto}`, {
+      method: 'POST',
+      headers: { ...authHeaders() }
+    })
+  );
+}
+
+export async function eliminarFavorito(idProducto) {
+  return manejarRespuesta(
+    await fetch(`${API_BASE}/usuarios/favoritos/${idProducto}`, {
       method: 'DELETE',
       headers: { ...authHeaders() }
     })
