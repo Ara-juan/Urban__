@@ -1,4 +1,4 @@
-# rutas de usuarios registro sesion recuperacion de contrasena perfil y favoritos
+# rutas de usuarios registro verificacion de correo sesion recuperacion de contrasena perfil y favoritos
 
 from __future__ import annotations
 
@@ -16,8 +16,10 @@ from app.schemas import (
     BloqueoUsuarioRequest,
     LoginRequest,
     RecuperarContrasenaRequest,
+    ReenviarVerificacionRequest,
     RegistroUsuarioRequest,
     RestablecerContrasenaRequest,
+    VerificarEmailRequest,
 )
 from app.security import (
     ApiError,
@@ -32,7 +34,12 @@ from app.security import (
     verificar_contrasena,
 )
 from app.serialization import fila_a_dict, filas_a_lista
-from app.services.correo import construir_enlace_recuperacion, enviar_correo_recuperacion
+from app.services.correo import (
+    construir_enlace_recuperacion,
+    construir_enlace_verificacion,
+    enviar_correo_recuperacion,
+    enviar_correo_verificacion,
+)
 from app.utils import parsear_entero
 
 # inicializamos esto para guardar registro de los errores por consola
@@ -74,35 +81,169 @@ async def registrar_usuario(
             "Es obligatorio aceptar la política de tratamiento de datos personales para registrarse.",
         )
 
+    correo_limpio = datos.email.strip().lower()
+    nombre_limpio = datos.nombre.strip()
+
     try:
-        # guardamos el usuario con rol CLIENTE y dejamos constancia legal de su aceptación y fecha
-        fila = await conexion.fetchrow(
-            """
-            INSERT INTO usuarios (
-                nombre, email, contrasena, telefono, direccion,
-                rol, acepto_politica, fecha_aceptacion_politica
+        # usamos transaccion para que si brevo falla al enviar el correo no quede creada una cuenta sin confirmar
+        async with conexion.transaction():
+            fila = await conexion.fetchrow(
+                """
+                INSERT INTO usuarios (
+                    nombre, email, contrasena, telefono, direccion,
+                    rol, acepto_politica, fecha_aceptacion_politica, email_verificado
+                )
+                VALUES ($1, $2, $3, $4, $5, 'CLIENTE', TRUE, NOW(), FALSE)
+                RETURNING id_usuario, nombre, email, rol, fecha_registro,
+                          acepto_politica, fecha_aceptacion_politica, email_verificado
+                """,
+                nombre_limpio,
+                correo_limpio,
+                hashear_contrasena(datos.contrasena),
+                datos.telefono,
+                datos.direccion,
             )
-            VALUES ($1, $2, $3, $4, $5, 'CLIENTE', TRUE, NOW())
-            RETURNING id_usuario, nombre, email, rol, fecha_registro,
-                      acepto_politica, fecha_aceptacion_politica
-            """,
-            datos.nombre.strip(),
-            datos.email.strip().lower(),
-            hashear_contrasena(datos.contrasena),
-            datos.telefono,
-            datos.direccion,
-        )
+
+            token_verificacion = crear_token(
+                {
+                    "id": fila["id_usuario"],
+                    "email": correo_limpio,
+                    "proposito": "verificar_email",
+                },
+                DURACION_TOKEN_SESION,
+            )
+            enlace = construir_enlace_verificacion(token_verificacion)
+
+            await enviar_correo_verificacion(
+                destinatario=correo_limpio,
+                nombre=nombre_limpio,
+                enlace=enlace,
+            )
     except UniqueViolationError as error:
         # este error salta si alguien intenta registrar un correo que ya existe
         raise ApiError(400, "El correo electrónico ya se encuentra registrado.") from error
+    except RuntimeError as error:
+        logger.error("Error al enviar correo de verificación en registro: %s", error)
+        raise ApiError(
+            500,
+            "No pudimos enviar el correo de verificación. Revisa que tu dirección esté bien escrita e inténtalo de nuevo.",
+        ) from error
     except Exception as error:  # noqa: BLE001
         logger.exception("Error al registrar usuario: %s", error)
         raise ApiError(500, "Error interno del servidor.") from error
 
     return {
-        "mensaje": "Usuario registrado con éxito",
+        "mensaje": "¡Cuenta creada! Te enviamos un enlace de verificación a tu correo (revisa también Spam) para activar tu acceso.",
+        "requiere_verificacion": True,
         "usuario": fila_a_dict(fila),
     }
+
+
+@router.post("/verificar-email")
+async def verificar_email(
+    datos: VerificarEmailRequest,
+    conexion: asyncpg.Connection = Depends(obtener_conexion),
+) -> dict[str, str]:
+    # confirma que el correo pertenece al usuario cuando pulsa el enlace recibido en su bandeja
+    if not datos.token:
+        raise ApiError(400, "El token de verificación es obligatorio.")
+
+    try:
+        payload = decodificar_token(datos.token)
+    except Exception as error:  # noqa: BLE001
+        raise ApiError(
+            400,
+            "El enlace de verificación es inválido o ha expirado. Solicita uno nuevo desde el inicio de sesión.",
+        ) from error
+
+    if payload.get("proposito") != "verificar_email" or not payload.get("id"):
+        raise ApiError(400, "El token proporcionado no corresponde a una verificación de correo.")
+
+    try:
+        usuario = await conexion.fetchrow(
+            "SELECT id_usuario, email_verificado FROM usuarios WHERE id_usuario = $1",
+            payload["id"],
+        )
+        if usuario is None:
+            raise ApiError(404, "La cuenta asociada a este enlace ya no existe.")
+
+        if usuario["email_verificado"]:
+            return {
+                "mensaje": "Tu correo electrónico ya estaba verificado. Ya puedes iniciar sesión."
+            }
+
+        await conexion.execute(
+            "UPDATE usuarios SET email_verificado = TRUE WHERE id_usuario = $1",
+            payload["id"],
+        )
+
+        return {
+            "mensaje": "¡Correo electrónico verificado con éxito! Tu cuenta ya está activa, inicia sesión para continuar."
+        }
+    except ApiError:
+        raise
+    except Exception as error:  # noqa: BLE001
+        logger.exception("Error al verificar email: %s", error)
+        raise ApiError(500, "Error interno al verificar el correo electrónico.") from error
+
+
+@router.post("/reenviar-verificacion")
+async def reenviar_verificacion(
+    datos: ReenviarVerificacionRequest,
+    conexion: asyncpg.Connection = Depends(obtener_conexion),
+) -> dict[str, str]:
+    # permite volver a enviar el enlace de confirmacion si el usuario no lo encontro o caduco
+    if not datos.email:
+        raise ApiError(400, "Por favor ingresa tu correo electrónico.")
+
+    try:
+        consulta = await conexion.fetchrow(
+            """
+            SELECT id_usuario, nombre, email, bloqueado, email_verificado
+            FROM usuarios
+            WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))
+            """,
+            datos.email,
+        )
+        if consulta is None:
+            raise ApiError(404, "No existe ninguna cuenta registrada con este correo.")
+
+        if consulta["bloqueado"]:
+            raise ApiError(403, "Esta cuenta se encuentra bloqueada y no puede verificarse.")
+
+        if consulta["email_verificado"]:
+            raise ApiError(
+                400,
+                "Este correo electrónico ya está verificado. Puedes iniciar sesión directamente.",
+            )
+
+        token_verificacion = crear_token(
+            {
+                "id": consulta["id_usuario"],
+                "email": consulta["email"],
+                "proposito": "verificar_email",
+            },
+            DURACION_TOKEN_SESION,
+        )
+        enlace = construir_enlace_verificacion(token_verificacion)
+
+        await enviar_correo_verificacion(
+            destinatario=consulta["email"],
+            nombre=consulta["nombre"],
+            enlace=enlace,
+        )
+
+        return {
+            "mensaje": "Te enviamos un nuevo enlace de verificación. Revisa tu bandeja de entrada o carpeta de spam."
+        }
+    except ApiError:
+        raise
+    except Exception as error:  # noqa: BLE001
+        logger.error("Error al reenviar correo de verificación: %s", error)
+        raise ApiError(
+            500,
+            "No se pudo reenviar el correo de verificación. Inténtalo más tarde.",
+        ) from error
 
 
 @router.post("/login")
@@ -119,7 +260,7 @@ async def iniciar_sesion(
         usuario = await conexion.fetchrow(
             """
             SELECT id_usuario, nombre, email, contrasena, telefono, direccion,
-                   rol, bloqueado, motivo_bloqueo
+                   rol, bloqueado, motivo_bloqueo, email_verificado
             FROM usuarios WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))
             """,
             datos.email,
@@ -143,6 +284,13 @@ async def iniciar_sesion(
             raise ApiError(
                 403,
                 f"Tu cuenta ha sido bloqueada por un administrador.{motivo}",
+            )
+
+        # exigimos que haya confirmado que su correo electronico es real antes de darle sesion
+        if not usuario["email_verificado"] and not es_administrador(dict(usuario)):
+            raise ApiError(
+                403,
+                "Debes verificar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada o spam.",
             )
 
         # si todo salio bien le armamos un token con el rol que tiene en la BD (CLIENTE o ADMINISTRADOR)
@@ -267,7 +415,7 @@ async def obtener_perfil(
         fila = await conexion.fetchrow(
             """
             SELECT id_usuario, nombre, email, telefono, direccion, rol,
-                   acepto_politica, fecha_aceptacion_politica
+                   acepto_politica, fecha_aceptacion_politica, email_verificado
             FROM usuarios WHERE id_usuario = $1
             """,
             usuario.get("id"),
@@ -454,7 +602,7 @@ async def listar_usuarios(
             """
             SELECT id_usuario, nombre, email, telefono, direccion, rol,
                    fecha_registro, acepto_politica, fecha_aceptacion_politica,
-                   bloqueado, motivo_bloqueo, fecha_bloqueo
+                   email_verificado, bloqueado, motivo_bloqueo, fecha_bloqueo
             FROM usuarios
             ORDER BY id_usuario DESC
             """
@@ -503,7 +651,7 @@ async def cambiar_bloqueo_usuario(
                 fecha_bloqueo = CASE WHEN $1 THEN NOW() ELSE NULL END
             WHERE id_usuario = $3
             RETURNING id_usuario, nombre, email, telefono, direccion, rol,
-                      fecha_registro, bloqueado, motivo_bloqueo, fecha_bloqueo
+                      fecha_registro, email_verificado, bloqueado, motivo_bloqueo, fecha_bloqueo
             """,
             datos.bloqueado,
             motivo_limpio if datos.bloqueado else None,

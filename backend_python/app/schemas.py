@@ -19,6 +19,14 @@ class RegistroUsuarioRequest(ModeloPeticion):
     direccion: str | None = None
     acepto_politica: bool | None = None
 
+# token recibido desde el enlace de confirmacion enviado al correo
+class VerificarEmailRequest(ModeloPeticion):
+    token: str | None = None
+
+# correo del usuario que solicita un nuevo enlace de verificacion
+class ReenviarVerificacionRequest(ModeloPeticion):
+    email: str | None = None
+
 # lo basico que necesitamos para validar que si puedan iniciar sesion
 class LoginRequest(ModeloPeticion):
     email: str | None = None

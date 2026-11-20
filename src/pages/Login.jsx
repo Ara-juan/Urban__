@@ -1,9 +1,11 @@
-// página de login, registro y recuperación con beneficios visibles para nuevos miembros
-import { useState, useEffect } from 'react';
+// página de login, registro, verificación de correo y recuperación con beneficios visibles
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   iniciarSesion,
   registrarUsuario,
+  verificarEmail,
+  reenviarVerificacion,
   solicitarRecuperacionContrasena,
   restablecerContrasena
 } from '../services/api.js';
@@ -14,6 +16,7 @@ import './Login.css';
 export default function Login() {
   const [searchParams] = useSearchParams();
   const resetToken = searchParams.get('resetToken');
+  const verifyToken = searchParams.get('verifyToken');
   const tabParam = searchParams.get('tab');
 
   const [pestañaActiva, setPestañaActiva] = useState(
@@ -22,7 +25,11 @@ export default function Login() {
   const [mensaje, setMensaje] = useState(null);
   const [mensajeError, setMensajeError] = useState(false);
   const [cargando, setCargando] = useState(false);
+  const [reenviando, setReenviando] = useState(false);
+  const [correoSinVerificar, setCorreoSinVerificar] = useState('');
   const [aceptoPolitica, setAceptoPolitica] = useState(false);
+
+  const tokenVerificadoRef = useRef(null);
 
   const { iniciarSesionLocal } = useAuth();
   const navigate = useNavigate();
@@ -34,6 +41,40 @@ export default function Login() {
       setPestañaActiva('register');
     }
   }, [resetToken, tabParam]);
+
+  // si el enlace trae ?verifyToken=..., activamos la cuenta automáticamente al cargar
+  useEffect(() => {
+    if (!verifyToken || tokenVerificadoRef.current === verifyToken) return;
+    tokenVerificadoRef.current = verifyToken;
+
+    let activo = true;
+    setPestañaActiva('login');
+    setCargando(true);
+    setMensaje('Verificando tu correo electrónico...');
+    setMensajeError(false);
+
+    verificarEmail(verifyToken)
+      .then((resultado) => {
+        if (!activo) return;
+        setCorreoSinVerificar('');
+        setMensaje(resultado.mensaje);
+        setMensajeError(false);
+        navigate('/login', { replace: true });
+      })
+      .catch((error) => {
+        if (!activo) return;
+        setMensaje(error.message || 'No se pudo verificar el correo electrónico.');
+        setMensajeError(true);
+        navigate('/login', { replace: true });
+      })
+      .finally(() => {
+        if (activo) setCargando(false);
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [verifyToken, navigate]);
 
   // si el usuario acepta desde el modal legal, marcamos automáticamente la casilla del registro
   useEffect(() => {
@@ -51,6 +92,7 @@ export default function Login() {
   const abrirPestañaRegistro = () => {
     setPestañaActiva('register');
     setMensaje(null);
+    setCorreoSinVerificar('');
 
     const yaAceptoAntes = localStorage.getItem('americanoshh_privacidad_aceptada') === 'true';
     if (!yaAceptoAntes && !aceptoPolitica) {
@@ -65,11 +107,13 @@ export default function Login() {
   const manejarLogin = async (event) => {
     event.preventDefault();
     setMensaje(null);
+    setCorreoSinVerificar('');
     setCargando(true);
 
     const formData = new FormData(event.target);
+    const emailIngresado = String(formData.get('email') || '').trim();
     const datos = {
-      email: formData.get('email'),
+      email: emailIngresado,
       contrasena: formData.get('contrasena')
     };
 
@@ -80,9 +124,29 @@ export default function Login() {
 
       setTimeout(() => navigate('/colecciones'), 1000);
     } catch (error) {
-      mostrarMensaje(error.message || 'error de conexión con el servidor.', true);
+      const textoError = error.message || 'error de conexión con el servidor.';
+      mostrarMensaje(textoError, true);
+
+      if (textoError.toLowerCase().includes('verificar tu correo') && emailIngresado) {
+        setCorreoSinVerificar(emailIngresado);
+      }
     } finally {
       setCargando(false);
+    }
+  };
+
+  const manejarReenvioVerificacion = async () => {
+    if (!correoSinVerificar || reenviando) return;
+    setReenviando(true);
+
+    try {
+      const resultado = await reenviarVerificacion(correoSinVerificar);
+      mostrarMensaje(resultado.mensaje, false);
+      setCorreoSinVerificar('');
+    } catch (error) {
+      mostrarMensaje(error.message || 'No se pudo reenviar el correo de verificación.', true);
+    } finally {
+      setReenviando(false);
     }
   };
 
@@ -101,9 +165,10 @@ export default function Login() {
     setCargando(true);
 
     const formData = new FormData(event.target);
+    const emailRegistrado = String(formData.get('email') || '').trim();
     const datos = {
       nombre: formData.get('nombre'),
-      email: formData.get('email'),
+      email: emailRegistrado,
       contrasena: formData.get('contrasena'),
       telefono: formData.get('telefono') || null,
       direccion: formData.get('direccion') || null,
@@ -115,8 +180,9 @@ export default function Login() {
       mostrarMensaje(resultado.mensaje, false);
       event.target.reset();
       setAceptoPolitica(false);
+      setCorreoSinVerificar(emailRegistrado);
 
-      setTimeout(() => setPestañaActiva('login'), 1500);
+      setTimeout(() => setPestañaActiva('login'), 1800);
     } catch (error) {
       mostrarMensaje(error.message || 'error de conexión con el servidor.', true);
     } finally {
@@ -223,7 +289,7 @@ export default function Login() {
                 role="button"
                 tabIndex="0"
                 onKeyDown={(e) => e.key === 'Enter' && setPestañaActiva('forgot')}
-                onClick={() => { setPestañaActiva('forgot'); setMensaje(null); }}
+                onClick={() => { setPestañaActiva('forgot'); setMensaje(null); setCorreoSinVerificar(''); }}
               >
                 ¿Olvidaste tu contraseña?
               </span>
@@ -246,7 +312,7 @@ export default function Login() {
             </div>
 
             <input type="text" name="nombre" aria-label="nombre completo" placeholder="Nombre completo" required />
-            <input type="email" name="email" aria-label="correo electrónico" placeholder="Email" required />
+            <input type="email" name="email" aria-label="correo electrónico" placeholder="Email real (te enviaremos enlace de activación)" required />
             <input type="password" name="contrasena" aria-label="crear contraseña" placeholder="Contraseña (Mín. 8 caracteres)" minLength={8} required />
             <input type="tel" name="telefono" aria-label="teléfono para envío express" placeholder="Teléfono WhatsApp (recomendado, solo números)" pattern="^[0-9]*$" />
             <input type="text" name="direccion" aria-label="dirección de entrega" placeholder="Dirección de entrega (recomendada)" />
@@ -351,6 +417,19 @@ export default function Login() {
         )}
 
         <AlertaMensaje mensaje={mensaje} esError={mensajeError} />
+
+        {pestañaActiva === 'login' && correoSinVerificar && (
+          <button
+            type="button"
+            className="btn-reenviar-verificacion"
+            onClick={manejarReenvioVerificacion}
+            disabled={reenviando}
+          >
+            {reenviando
+              ? 'Reenviando enlace...'
+              : `Reenviar correo de verificación a ${correoSinVerificar}`}
+          </button>
+        )}
       </section>
     </main>
   );

@@ -47,6 +47,9 @@ class Settings:
     jwt_secret: str
     resend_api_key: str
     resend_from: str
+    brevo_api_key: str
+    brevo_sender_email: str
+    brevo_sender_name: str
     frontend_url: str
     entorno: str
     admin_email: str
@@ -66,13 +69,21 @@ def cargar_settings() -> Settings:
         # por defecto nos conectamos con ssl porque asi lo exige supabase para funcionar
         db_ssl=_booleano("DB_SSL", True),
         jwt_secret=os.getenv("JWT_SECRET", ""),
-        resend_api_key=os.getenv("RESEND_API_KEY", ""),
-        # este es el correo desde el que salen los mensajes en resend para que no lleguen a spam
+        resend_api_key=os.getenv("RESEND_API_KEY", "").strip(),
+        # este es el correo desde el que salen los mensajes de recuperacion en resend
         resend_from=(
             os.getenv("RESEND_FROM")
             or "Americanoshh Support <onboarding@resend.dev>"
         ).strip(),
-        # esta direccion del frontend la usamos para armar los links de recuperacion de clave que van en los correos
+        # credenciales de brevo para enviar los correos de verificacion de cuenta a cualquier destinatario
+        brevo_api_key=os.getenv("BREVO_API_KEY", "").strip(),
+        brevo_sender_email=(
+            os.getenv("BREVO_SENDER_EMAIL") or "dcuentapro@gmail.com"
+        ).strip(),
+        brevo_sender_name=(
+            os.getenv("BREVO_SENDER_NAME") or "Americanoshh"
+        ).strip(),
+        # esta direccion del frontend la usamos para armar los links que van en los correos
         frontend_url=(
             os.getenv("FRONTEND_URL") or "https://americanos-hh.netlify.app"
         ).strip().rstrip("/"),

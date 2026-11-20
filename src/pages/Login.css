@@ -251,6 +251,31 @@
   display: none;
 }
 
+/* boton secundario para reenviar correo de verificacion */
+.btn-reenviar-verificacion {
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 204, 0.4);
+  background: rgba(0, 255, 204, 0.1);
+  color: #00ffcc;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-reenviar-verificacion:hover:not(:disabled) {
+  background: rgba(0, 255, 204, 0.2);
+  border-color: #00ffcc;
+}
+
+.btn-reenviar-verificacion:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .link {
   font-size: 14px;
   margin-top: 20px;

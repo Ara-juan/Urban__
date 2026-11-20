@@ -69,6 +69,26 @@ export async function registrarUsuario({ nombre, email, contrasena, telefono, di
   );
 }
 
+export async function verificarEmail(token) {
+  return manejarRespuesta(
+    await fetch(`${API_BASE}/usuarios/verificar-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    })
+  );
+}
+
+export async function reenviarVerificacion(email) {
+  return manejarRespuesta(
+    await fetch(`${API_BASE}/usuarios/reenviar-verificacion`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+  );
+}
+
 export async function iniciarSesion({ email, contrasena }) {
   const data = await manejarRespuesta(
     await fetch(`${API_BASE}/usuarios/login`, {
